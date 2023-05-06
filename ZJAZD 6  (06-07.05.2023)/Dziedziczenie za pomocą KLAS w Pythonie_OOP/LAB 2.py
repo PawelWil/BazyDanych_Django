@@ -5,7 +5,6 @@
 #D. Nie będzie mógł atakować, jeżeli jego życie spadnie poniżej 20 punktów.
 #E. PRZYJMUJE DWA RAZY MNIEJSZE OBRAŻENIA, JEŻELI JEGO ŻYCIE SPADNIE PONIŻEJ 50.
 
-#test asdsadasd
 class Enemy:
 
     def __init__(self, name='Enemy', health=0, hit_power=0):
