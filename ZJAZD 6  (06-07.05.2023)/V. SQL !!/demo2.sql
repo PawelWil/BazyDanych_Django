@@ -13,7 +13,7 @@ SELECT Production.product.name         As ProductName,
        production.ProductCategory.name AS CategoryName
 FROM production.Product
          INNER JOIN production.productsubcategory
-                    on production.productsubcategory.productcategoryid = Production.product.productsubcategoryid
+                    ON production.productsubcategory.productcategoryid = Production.product.productsubcategoryid
          INNER JOIN production.ProductCategory
                     ON production.productsubcategory.productcategoryid = production.ProductCategory.productcategoryid;
 
@@ -44,6 +44,8 @@ FROM production.Product p
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid
 WHERE c.name like '%Clo%'
 ORDER BY SubCategoryName desc, ProductName;
+
+
 
 -- Outer joins
 
@@ -124,7 +126,7 @@ where oh.salesorderid is NULL;
 -- TODO SUBQUERIES
 
 -- maksymalna cena jednostkowa w Sales.SalesOrderDetail (najwyższa cena, za jaką sprzedano pojedynczy produkt).
--- MAX - jest to funkcja agregująca -> będziemy o tym mówić za chwilę
+-- MAX - jest to funkcja -> będziemy o tym mówić za chwilę
 SELECT MAX(UnitPrice)
 FROM Sales.SalesOrderDetail;
 
