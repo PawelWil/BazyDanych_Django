@@ -1,7 +1,10 @@
+from ingredient import Ingredient
+
 ingredients = []
 
+
 def add_ingredient(name, calories, protein, fat, carbs, fiber, ingredient_type) -> None:
-    ingredients.append(ingredient(name, calories, protein, fat, carbs, fiber, ingredient_type))
+    ingredients.append(Ingredient(name, calories, protein, fat, carbs, fiber, ingredient_type))
 
 
 def find_all():
@@ -11,11 +14,12 @@ def find_all():
     """
     return ingredients.copy()
 
+
 def find_by_name_like(name: str):
     """
     Find all ingredients by name
-    :param name:
-    :return:
+    :param name: name 'like'
+    :return: list of ingredients
     """
     copy = find_all()
     result = []
@@ -23,3 +27,5 @@ def find_by_name_like(name: str):
     for ingredient in copy:
         if name.casefold() in ingredient.name.casefold():
             result.append(ingredient)
+
+    return result
