@@ -63,9 +63,13 @@ CREATE TABLE Orders (
   OrderDate datetime,
   CustomerID int
 )
- 
- 
+
+SELECT * FROM Orders
+
+
 -- wstawianie danych do tabeli Customer
+SELECT * FROM Customers
+
 INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
 VALUES (1, 'John', 'Smith', '19800105')
  
@@ -242,8 +246,8 @@ SELECT * FROM Customers
  
 -- Klucze obce (foreign keys)
 ---------------------------------------
--- DROP TABLE Customers
--- DROP TABLE Orders
+DROP TABLE Customers
+DROP TABLE Orders
  
 -- klucze obce niesą wymagane do łączenia tabel
 -- ale pomagają egzekwować integralność referencyjną
