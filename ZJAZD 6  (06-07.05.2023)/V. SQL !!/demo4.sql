@@ -19,7 +19,7 @@ CREATE DATABASE NewDatabase
 
 -- Tworzenie i modyfikowanie tabeli
 ---------------------------------------
-USE chudzick
+USE wiltos
 select DB_NAME();
 
 -- Tabela domyślnie nam się utworzy w schemacie domyslnym - dbo

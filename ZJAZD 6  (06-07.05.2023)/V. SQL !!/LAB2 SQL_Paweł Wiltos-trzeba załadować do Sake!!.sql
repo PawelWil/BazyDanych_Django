@@ -3,6 +3,8 @@ USE AdventureWorks2014
 -- LINK do dokumentacji AdventureWorks2014, na bazie której mozna wyciągnąć wszystkie powiązania
 -- https://www.sqldatadictionary.com/AdventureWorks2014.pdf (dostępne na Teamsie co)
 
+-- Prawdopodobnie na PyCharmie tych Laboratoriów nie zrobie - muszę to zrobić z MicrosoftSQL Server Managament STudio
+
 
 -- 1. Wybierz nazwę produktu i cenę katalogową dla wszystkich produktów w tabeli
 -- [Production.Product] i dołącz nazwę kategorii produktów [Production.ProductCategory]
