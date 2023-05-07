@@ -74,17 +74,20 @@ WHERE ProductSubcategoryID <= 10 OR ProductSubcategoryID > 20
 
 
 
-
 -- Porównywanie ciągów znaków
 SELECT * FROM Production.ProductSubcategory
 WHERE Name = 'Mountain Bikes'
 
 -- % dowolna ilość (lub brak) dowolnego znaku
 SELECT * FROM Production.ProductSubcategory
-WHERE Name LIKE '%Bikes'
+WHERE Name LIKE '%Bikes'  -- xxxBikes aBikes itd.
+                          -- ale za Bikes już nic nie będzie, chyba że % będzie na koncu słowa
 
 SELECT * FROM Production.ProductSubcategory
 WHERE Name LIKE 'C%'
+
+SELECT * FROM Production.ProductSubcategory
+WHERE Name LIKE '%es%' -- tu es przed i po
 
 -- _ pojedynczy, dowolny znak
 SELECT * FROM Production.Product WHERE Name LIKE 'Flat Washer _'
@@ -187,8 +190,9 @@ WHERE Color IS NULL
 -- przykład użycia funkcji
 SELECT Name, Color, ISNULL(Color, 'no color') AS SuperColor FROM Production.Product
 
-
 SELECT ISNULL(Color, 'NO COLOR') FROM Production.Product
+
+
 -- eliminowanie duplikatów z wyniku
 SELECT DISTINCT Color FROM Production.Product ORDER BY Color
 
