@@ -52,12 +52,13 @@ USE AdventureWorks
 SELECT ProductID, Name, ProductNumber, Color, StandardCost FROM Production.Product
 
 
--- Sortowanie wierszy
--- ORDER BY ASC | DESC
-SELECT ProductID, Name, Color FROM Production.Product -- w zależności w jakiej kolejności sobie wpiszę kolumny, w takiej
+-- Sortowanie wierszy za pomocą polecenia ORDER BY ASC | DESC
+SELECT ProductID, Name, Color FROM Production.Product
+ORDER BY Name
+-- w zależności w jakiej kolejności sobie wpiszę kolumny, w takiej
                               -- kolejności one będą wyświetlane, czyli tu jako pierwsze ProductID, potem Name,
                               -- a na końcu Color
-ORDER BY Name -- te trzy kolumny są posortowane po kolumnie 'name' - czyli zgodność alfabetyczna dla tej kolumny 'name'
+ -- te trzy kolumny są posortowane po kolumnie 'name' - czyli zgodność alfabetyczna dla tej kolumny 'name'
               -- a pozostałe kolumny już wynikowo, ale jeśli pozostałe nie mają DESC, to z defaultu jest to ASC
     -- WAŻNE: jak widać sortowanie jest rosnąco, czyli od 'a' do 'z', po defaultowo to sortowanie zawsze jest rosnące,
     -- czyli 'ASCEnD'. Jakbyśmy chcieli zmienić na malejąco, to musimy to zrobic specjalnie,
@@ -89,12 +90,14 @@ SELECT * FROM Production.Product WHERE Color = 'Black' -- tu wyświetlamy wszyst
 SELECT ProductID, Name, ProductNumber, Color, ProductSubcategoryID
 FROM Production.Product WHERE Color = 'Black' -- tu robimy co powyższe, ale tylko dla 5 kolumn
 
-SELECT ProductID ProductSubcategoryID
+SELECT ProductSubcategoryID
 FROM Production.Product WHERE Color = 'Black'--! WAŻNE: my nawet możemy tej kolumny Color nie wyświetlać,
 -- ale możemy dalej po niej filtrować, jak w tym przypadku: wyświetlamy tylko kolumnę ProductSubcategoryID, ale
 -- filtrujemy ją po kolumnie Color, która nie jest wyświetlana
 
 SELECT * FROM Production.ProductSubcategory
+SELECT * FROM Production.ProductCategory
+
 
 SELECT * FROM Production.ProductSubcategory WHERE ProductSubcategoryID = 2 --tu filtrujemy po ProdSUbcID po cyfrze 2,
 -- a z racji, że jest on kluczem głównym, to w tej tabeli występuje tylko raz
@@ -114,7 +117,7 @@ SELECT * FROM Production.ProductSubcategory
 WHERE ProductSubcategoryID <= 10 -- mniejsze lub równe 10
 
 SELECT * FROM Production.ProductSubcategory
-WHERE Name <> 'Mountain Bikes' -- jest różna niż (ISO) - ten diamencik <> to jest 'nie równe do', czyli to
+WHERE Name <> 'Mountain Bikes' -- jest różna niż (ISO) - ten diamencik <> to jest 'różne', czyli to
 -- samo co !=, ale jest bardziej oficjalną wersją zgodną z ISO. Zaś != nie jest zgodne z ISO, nie mniej jednak
 -- oba te operatory są stosowane. Można je stosować zamiennie. Chociaż częstszym jest !=.
 
@@ -126,15 +129,23 @@ SELECT * FROM Production.ProductSubcategory
 WHERE ProductSubcategoryID <= 10 OR ProductSubcategoryID > 20 -- spodziewamy się po tej filtracji wyniku,
 -- że ProdSubCatID będzie <=10 lub (or) >=20
 
+-- zakres wartosci
+SELECT * FROM Production.ProductSubcategory
+WHERE ProductSubcategoryID >= 10 AND ProductSubcategoryID < 20
+-- taki sam wynik, ale szybciej/zwięźlej bo za pomocą komendy BETWEEN
+SELECT * FROM Production.ProductSubcategory
+WHERE ProductSubcategoryID BETWEEN 10 AND 19
+
+
 
 -- Porównywanie ciągów znaków: albo '=' - dokładnie taka // 'LIKE' + % = ciąg znaków przed lub po taki jak w filtrze
 SELECT * FROM Production.ProductSubcategory
 WHERE Name = 'Mountain Bikes' -- tu filtrujemy po ciągu znaków, które w tym przypadku są umieszczone w kolumnie
 -- Name, i muszą być w całości równe 'Mountain Bikes'
 
--- % dowolna ilość (lub brak) dowolnego znaku
+-- % dowolna ilość (lub brak) dowolnego znaku za pomocą polecenia 'LIKE'
 SELECT * FROM Production.ProductSubcategory
-WHERE Name LIKE '%Bikes'  -- jeśli mymy '%Bikes' to weźmie nam wyfiltruje wszystko co ma Bikes na końcu, z różnymi
+WHERE Name LIKE '%Bikes'  -- jeśli mamy '%Bikes' to weźmie nam wyfiltruje wszystko co ma Bikes na końcu, z różnymi
                           -- przedrostkami przed nim, bo % jest przed nim -- czyli za Bikes już nic nie będzie,
                           -- chyba że % będzie na koncu słowa, czyli 'Bikes%' - to wyfiltruje nam wszystkie slowa
                           -- które się zaczną od Bikes, a za nim będą miały rożne ciągi znaków, którym również jest
@@ -150,14 +161,16 @@ WHERE Name LIKE '%es%' -- tu 'es' stałe, które może być na początku, końcu
 -- + wszystko inne co przed i po 'es' będzie
 
 -- _ pojedynczy, dowolny znak
-SELECT * FROM Production.Product WHERE Name LIKE 'Flat Washer _' -- 'spacja' + '_' to jest wyfiltrowanie po znaku
--- żądanej nazwie (u nas 'Flat Washer') + spacja + jeden dowolny OSOBNY znak (może być liter, cyferka),
+SELECT * FROM Production.Product
+WHERE Name LIKE 'Flat Washer _' -- tu mamy: słowo 'Flat Washer' + 'spacja' + '_' to jest wyfiltrowanie po znaku
+-- jeden dowolny OSOBNY znak (może być litera, cyfra),
 -- np. Flat Washer 1
 
 
 -- [] PRZEKAZANIE listy znaków, które robimy za pomocą nawiasu kwadratowego
 SELECT * FROM Production.Product WHERE Name LIKE 'Classic Vest, [LM]' -- tu dostajemy słowo Classic Vest + spacja,
--- bo jak widać po przecinku jest spacja + pojedynczą literę 'L' albo 'M'
+-- bo jak widać po przecinku jest spacja + pojedynczą literę 'L' albo 'M', czyli dostaniemy np. 'Classic Vest, L '
+-- lub 'Classic Vest, M'
 
 SELECT * FROM Production.Product WHERE Name LIKE 'Classic Vest, [K-Z]' -- zaś tu dostajemy słowo Classic Vest +
 -- + spacja + pojedyncze litery z zakresu od K do Z
@@ -241,7 +254,8 @@ SELECT ProductSubcategoryID, Color FROM Production.Product
 WHERE (ProductSubcategoryID = 2 AND Color <> 'Red')
  OR (ProductSubcategoryID = 1 AND Color <> 'Black')
 ORDER BY ProductSubcategoryID, Color -- i jeszcze sortowanie po ProdSubCatID rosnąco, a następnie
--- te powtarzalne po kolorze
+-- te powtarzalne po kolorze też rosnąco (bo wiadomo, że jak nie podajemy Desc, to z defaultu jest brane ASC,
+-- czyli rosnące
 
 
 
@@ -271,11 +285,11 @@ WHERE OrderDate >= '2004-05-01' AND OrderDate <= '2004-05-07'
 -- Zapisał je w taki sam sposób.
 
 
--- jeszcze inaczej dla T-SQL (to jest płatny silnik, zrobiony przez Microsoft) - to jest rozwinięcie dla SQL przez Microsofta - i np. na
--- PostgreSQL nie zadziała, bo Microsoft chciał mieć bardziej rozbudowany silnik, gdzie PostgreSQL tego nie ma.
--- Ale jest jedna duża różnica, T-SQL jest płatny i to nie mało, a wcale nie tak dużo lepszy od PostgreSQL, który
--- jest darmowy, dlatego nawe duże korporacje migrują swoje bazy danych do PostgreSQL, który je obsługuje, wiadomo
--- jako silnik.
+-- jeszcze inaczej dla T-SQL (to jest płatny silnik, zrobiony przez Microsoft) - to jest rozwinięcie dla SQL przez
+-- Microsofta - i np. na PostgreSQL nie zadziała, bo Microsoft chciał mieć bardziej rozbudowany silnik,
+-- gdzie PostgreSQL tego nie ma. Ale jest jedna duża różnica, T-SQL jest płatny i to nie mało, a wcale nie tak dużo
+-- lepszy od PostgreSQL, który jest darmowy, dlatego nawe duże korporacje migrują swoje bazy danych do PostgreSQL,
+-- który je obsługuje, wiadomo jako silnik.
 SELECT * FROM Sales.SalesOrderHeader
 WHERE OrderDate BETWEEN CAST('2004-05-01' as date) AND CAST('2004-05-07' as date) -- raczej nie zadziała na PostgreSQL
 
@@ -304,8 +318,8 @@ SELECT ISNULL(Color, 'NO COLOR') FROM Production.Product -- tu to samo co powyż
 -- miała nowej nazwy jak powyżej, tylko nazwę z defaultu nadawana, po wykorzystaniu ISNULLA, czyli 'anonymous'
 
 
--- eliminowanie duplikatów z wyniku ' DISTINCT'  - czyli powtórzeń. Pokaże nam tylko wszystkie niepowtarzalne w poniższym
--- przypadku kolory -  czyli jeśli są duplikaty, to nie duplikuj tych kolorów, tylko pokaż te kolory, które
+-- eliminowanie duplikatów z wyniku za pomocą 'DISTINCT'- czyli powtórzeń. Pokaże nam tylko wszystkie niepowtarzalne
+--w poniższym przypadku kolory -  czyli jeśli są duplikaty, to nie duplikuj tych kolorów,tylko pokaż te kolory,które
 -- są w całym pakiecie, czyli np. red, blue, yellow, null - czyli będą 4 wiersze, mimo tego, że blue jest 10,
 -- a yellow 20, to SQL pokaże tylko jakie generalnie są kolory, nie będzie ich powtarzał, jeśli się te kolory
 -- powtarzają.
@@ -320,7 +334,7 @@ FROM Sales.SalesOrderHeader
 SELECT CustomerID AS cliente, OrderDate AS [fecha de pedido], ShipDate AS [fecha de entrega]
 FROM Sales.SalesOrderHeader -- zmieniamy nazwy kolumny na nowe, np. CustomerID na cliente itd.
 -- Ważna rzecz, że jak zmieniamy nazwy kolumn (aliasujemy je) te nowe nazwy muszą być albo w nawiasach kwadratowych
--- albo w apostrofach.
+-- albo w apostrofach albo bez niczego (bez apostrofów i bez nawiasów kwadratowych]
 
 -- tabele również możemy aliasować (później..), na razie korzystamy max z 1 tabeli na zapytanie :)
 
@@ -334,7 +348,8 @@ SELECT TOP 5 * FROM HumanResources.Employee ORDER BY ModifiedDate DESC
 -- FUNKCJA COUNT zlicza nam ilość wierszy w tabeli Employee i zapisuję tą daną w kolumnie o nazwie 'employeeCnt'
 SELECT COUNT(*) AS employeesCnt FROM HumanResources.Employee
 
--- Użycie FUNKCJI TOP w postaci procentowej (np. daj mi 10% TOP=górnych=pierwszych wierszy) z całości=ze wszystkich
+-- Użycie FUNKCJI TOP w postaci procentowej (np. daj mi 10% TOP=górnych=pierwszych wierszy,
+-- z całości=ze wszystkich(czyli np jeśli wszytskich jest 290, to da nam 29 wierszy)
 -- wierszy (*), ze schematu HumanResources i tabeli Employee + dodatkowo sortowane po malejącej dacie
 SELECT TOP 10 PERCENT * FROM HumanResources.Employee ORDER BY ModifiedDate DESC
 
@@ -350,8 +365,7 @@ FROM Person.Contact -- tu wyświetlamy sobie kolumnę FirstName, LastName + tera
 
 
 -- Funkcja LEFT, która pobiera znaki od lewej strony
-SELECT
- FirstName,
+SELECT FirstName,
  LEFT(FirstName, 1) AS FirstLetterOfName,
  LEFT(FirstName, 3) AS First3LettersOfName
 FROM Person.Contact -- tu funkcja LEFT pobierze z kolumny FirstName 1 literę od lewej + nada nową nazwę tej kolumnie
