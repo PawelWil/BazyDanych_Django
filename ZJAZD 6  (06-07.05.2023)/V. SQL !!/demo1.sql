@@ -18,7 +18,7 @@
 -- obsługują konkretną bazę danych, którą w naszym przypadku jest np. baza danych AdventureWorks, czy 'Master -
 -- za pomocą kodu/instrukcji które wychodzą z Idle=Klient. Wiadomo też, że Idle=Klient musi się wpierw połączyć z
 -- danym silnikiem konkretnej bazy danych, żeby móc jako Klient, który coś chce wysyłać żądania do silnika, który to
--- następnie wyciągnie te dane z jakiejś bazy danych albo coś na nije zapisze.
+-- następnie wyciągnie te dane z jakiejś bazy danych albo coś na niej zapisze.
 -- I jak idle=Klient wysyła polecenie pobrania danej kolumny z danej bazy danych i tabeli,
 -- to silnik te polecenia odbiera i pobiera te dane z konkretnej bazy danych i docelowo te dane albo
 -- modyfikuje, albo zapisuje jako nowe, na danej bazie danych.
@@ -33,7 +33,7 @@ SELECT * FROM Production.Product
 -- 'AdventureWorks' to baza danych, z której schemat, a docelowo tabela będzie zaciągna.
   -- myśmy tą DB 'AdventureWorks' podali i uruchomili powyżej, ale można też to zrobić od razu w jednej linii,
   -- tak jak poniżej --> '... FROM AdventureWorks.Production.Product', ale to się będzie tyczyło danych tylko
-  -- dla tej jednej linii. Jak chcemy żeby cały czas była obsługiwana dana DB, to musimy poprzez
+  -- dla tego jednego pobrania. Jak chcemy żeby cały czas była obsługiwana dana DB, to musimy poprzez
   -- polecenie 'USE' ją odpalić: '... USE AdventureWorks'
 -- 'Production' to schemat (czyli takie nasze pudełko, w  którym są trzymane różne tabele)
 -- 'Product' to tabela, w której są trzymane dane, które nas interesują
@@ -47,7 +47,8 @@ SELECT * FROM AdventureWorks.Production.Product
 
 USE AdventureWorks
 
--- teraz wyświetlamy tylko 5 kolumn z tabeli Product (dajemy je po przecinku), schematu Production i wcześniej uruchomionej bazy danych 'AdventureWorks'
+-- teraz wyświetlamy 5 kolumn z tabeli Product (dajemy je po przecinku), schematu Production i wcześniej
+-- uruchomionej bazy danych 'AdventureWorks'
 SELECT ProductID, Name, ProductNumber, Color, StandardCost FROM Production.Product
 
 
@@ -57,7 +58,7 @@ SELECT ProductID, Name, Color FROM Production.Product -- w zależności w jakiej
                               -- kolejności one będą wyświetlane, czyli tu jako pierwsze ProductID, potem Name,
                               -- a na końcu Color
 ORDER BY Name -- te trzy kolumny są posortowane po kolumnie 'name' - czyli zgodność alfabetyczna dla tej kolumny 'name'
-              -- a pozostałe kolumny już wynikowo
+              -- a pozostałe kolumny już wynikowo, ale jeśli pozostałe nie mają DESC, to z defaultu jest to ASC
     -- WAŻNE: jak widać sortowanie jest rosnąco, czyli od 'a' do 'z', po defaultowo to sortowanie zawsze jest rosnące,
     -- czyli 'ASCEnD'. Jakbyśmy chcieli zmienić na malejąco, to musimy to zrobic specjalnie,
     -- za pomocą instrukcji 'DESCEnD'
