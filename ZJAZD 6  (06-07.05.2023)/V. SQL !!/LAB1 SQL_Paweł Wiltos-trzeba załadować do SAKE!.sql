@@ -1,3 +1,5 @@
+Use AdventureWorks2014
+
 -- ----------------Składnia SQL – SELECT, ALIASY, SORT
 -- 1. Wyświetl wszystkie kolumny z tabeli Produktów [Production.Product]
 SELECT * FROM Production.Product
@@ -37,30 +39,67 @@ SELECT Name, ListPrice from production.Product
 where ListPrice between 500 and 1000
 
 
--- 9. Wyświetl kolumny Name, Color i Size dla wszystkich produktów które mają kolor „Black” i
+-- 9. Wyświetl kolumny Name, Color i Size, dla wszystkich produktów które mają kolor „Black” i
 -- rozmiar „M”, uporządkowane według Name [Production.Product]
+Select Name, Color, Size from Production.Product
+WHERE Color = 'Black' and Size = 'M' order by Name
 
 
 -- 10. Wyświetl kolumny BusinessEntityID i HireDate dla wszystkich pracowników zatrudnionych w
 -- 2010 r., uporządkowane według HireDate [HumanResources.Employee]
+-- USE AdventureWorks2014
+SELECT  BusinessEntityID, HireDate FROM HumanResources.Employee
+where HireDate > '2010' order by HireDate
+
+
 
 -- 11. Wybierz wszystkich klientów z Niemiec i posortuj ich według PersonID. (2 zapytania)
 -- [Sales.Customer]
 
+SELECT name, TerritoryID from Sales.SalesTerritory
+WHERE Name = 'Germany'
+
+SELECT * from Sales.Customer
+where TerritoryID = 8 order by PersonID
+
+
+
 -- 12. Wybierz produkty z kategorii "Components" i posortuj je według nazwy. (3 zapytania)
 -- [Production.Product]
+
+SELECT components from Production.p
+
+
 
 -- 13. Wybierz pracowników zatrudnionych w okresie od 1 stycznia 2005 do 31 grudnia 2006 i
 -- posortuj ich według daty zatrudnienia. [HumanResources.Employee]
 
+SELECT * from HumanResources.Employee
+WHERE HireDate between '2005-01-01' and '2006-12-31' order by HireDate
+
+
 -- 14. Wybierz zamówienia od klienta o identyfikatorze 29485 i posortuj je według daty zamówienia
 -- malejąco. [Sales.SalesOrderHeader]
+
+SELECT * from Sales.SalesOrderHeader
+where CustomerID='29485' order by OrderDate desc
+
+
 
 -- 15. Wybierz wszystkie zamówienia, które mają metodę dostawy "OVERSEAS - DELUXE" lub
 -- "CARGO TRANSPORT 5" i posortuj je według daty wysyłki. (2 zapytania)
 -- [Sales.SalesOrderHeader]
+SELECT ShipMethodID, Name from Purchasing.ShipMethod
+where Name = 'OVERSEAS - DELUXE' or Name = 'CARGO TRANSPORT 5'
+
+SELECT * from  Sales.SalesOrderHeader
+where ShipMethodID = 5 or ShipMethodID = 3 order by ShipDate
+
 
 -- 16. Wybierz wszystkie produkty o nazwie zawierającej słowo "bike" i posortuj je według nazwy w
 -- porządku rosnącym.[Production.Product] --
+select * from Production.Product
+where Name LIKE '%bike%' order by Name
 
-USE AdventureWorks2014
+
+
