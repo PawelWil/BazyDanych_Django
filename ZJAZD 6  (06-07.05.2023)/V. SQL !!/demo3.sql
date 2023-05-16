@@ -59,7 +59,8 @@ SELECT UPPER(Name) AS ProductName, -- Funkcja 'UPPER' przekształca wszystkie li
        -- 'SUBSTRING' z kolumny 'ProductNumber' wyciągninęcie jakichś znaków i umieszczenie ich w innej kolumnie -
        -- w kolumnie 'ModelCode'. ProductNumber wygląda następująco: FR-T98Y-54, czyli za pomocą funkji w funkcji -
        -- u nas tą funkcją zagnieżdżoną jest funkcja 'CharIndex', która identyfikuje pierwszy dash= '-',
-       -- który jest znakiem 3, więc żeby zacząć wyciąganie od znaku 4, musimy dodać 1, i po przecinku podajemy
+       -- który jest znakiem numer 3, więc żeby zacząć wyciąganie od znaku 4, nie zawrzeć dasha,
+       -- musimy dodać 1, i po przecinku podajemy
        -- ile znaków wyciągamy, czyli podaliśmy 4, więc wyciągamy 4 znaki + wrzucamy te 4 znaki w nową zaaliaso-
        -- waną kolumnę ''ModelCode'
 FROM Production.Product; -- dane bierzemy ze schematu Production i z tabeli Product
@@ -71,16 +72,26 @@ FROM Production.Product; -- dane bierzemy ze schematu Production i z tabeli Prod
 -- minimum, or maximum. - wyciąga minimalną lub maksymalną wartość
 
 
-SELECT COUNT(*) AS Products,
-       COUNT(DISTINCT ProductSubcategoryID) AS SubCategories,
-       AVG(ListPrice) AS AveragePrice
-FROM Production.Product;
+SELECT COUNT(*) AS Products, -- count + (*), liczy nam ile mamy wszystkich = '*' wierszów w kolumnie Products
+       COUNT(DISTINCT ProductSubcategoryID) AS SubCategories, -- tu nam Count liczy ile jest unikalnych kategorii
+       -- w kolumnie 'ProductSubcategoryID' i wrzuca nam tą daną do zaliasowanej kolumny 'SubCategories'
+       AVG(ListPrice) AS AveragePrice -- i tu za pomocą funkcji AVG, wyciągamy średnią cenę, z cen zawartych
+        -- w kolumnie ListPrice, które to zostały przerzucone do nowej kolumny AveragePrice
+FROM Production.Product; -- dane ze schematu Production i tabeli Product
 
-SELECT COUNT(DISTINCT p.ProductID) AS BikeModels, AVG(p.ListPrice) AS AveragePrice
-FROM Production.Product AS p
-         JOIN Production.ProductSubcategory AS c
+
+
+SELECT COUNT(DISTINCT p.ProductID) AS BikeModels, AVG(p.ListPrice) AS AveragePrice --tu nam liczy (Count) ile jest
+-- unikalnych (Distinct) produktów, które zawierają w sobie słowo Bikes ('%Bikes' - na końcu po prawej stronie jest
+-- Bikes + inne cyfry/znaki/litery po lewej,przed Bikes)zawarte w kolumnie 'ProductID',zaliasowane jako'BikeModels'
+-- + dodatkowo liczy średnią cenę z kolumny ListPrice, która została zaliasowana jako 'AveragePrice'
+FROM Production.Product AS p -- te dane pochodzę ze shematu Production i tabeli Product, ktore to zostało (ten
+    -- schemat i tabela nazwane jako 'p') i użyte w dalszym joinowaniu
+         JOIN Production.ProductSubcategory AS c -- a tu jak widzimy najpierw nazwę schematu Production i tabeli
+         --ProductSubcategory zamieniamy(aliasujemy) na 'c', które to ('p' i 'c') następnie joinujemy po kolumnie
+         -- 'ProductSubcategoryID' za pomocą operatora 'ON'
               ON p.ProductSubcategoryID = c.ProductSubcategoryID
-WHERE c.Name LIKE '%Bikes';
+WHERE c.Name LIKE '%Bikes'; -- gdzie struktura 'c' w kolumnie 'Name' zawiera po brawej słowo 'Bikes'
 
 
 
