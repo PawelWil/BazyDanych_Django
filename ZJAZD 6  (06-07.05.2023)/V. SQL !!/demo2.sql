@@ -182,7 +182,7 @@ SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 -- w Selectach powyżej już wpisujemy zaliasowane nazwy schematów i tabel, tylko wrzucamy kolumny oryginalnie,
 -- ktore również jak widać powyżej zostały zaliasowane.
 -- Jak widać taki kod zamiast 8 linii zajął 4 linie - czyli jest szybszy, co nie znaczy, że np. dla mnie
--- czytelniejszy.. ;- )
+-- czytelniejszy.. ;--)
 FROM production.Product p
          JOIN production.productsubcategory pc on pc.productcategoryid = p.productsubcategoryid
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid;
