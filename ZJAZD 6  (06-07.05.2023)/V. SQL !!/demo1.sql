@@ -1,4 +1,4 @@
------------------------------------------
+----------------------------------------------
 -- SELECT
 -- SSMS pomaga konstruować zapytania- kolorując
 -- i podpowiadając (IntelliSense) składnię
