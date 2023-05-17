@@ -101,23 +101,31 @@ WHERE c.Name LIKE '%Bikes'; -- gdzie struktura 'c' w kolumnie 'Name' zawiera po 
 -- chcąc filtrować dane po zgrupowaniu, należy zamiast 'Where', używać 'Having'
 -- Kolumny, po których chcemy wykonać grupowanie muszą znajdować się po słowie 'Select'
 
-SELECT StoreID, COUNT(CustomerID) AS Customers
+SELECT StoreID, COUNT(CustomerID) AS Customers --wybieramy kolumne StoreID + zliczamy ilość klientów w kolumnie
+-- CustomerID którzy są przypisani do danego sklepu + tą kolumnę CustomersID aliasujemy na Customers
 FROM Sales.Customer
-GROUP BY StoreID
-ORDER BY Customers desc;
+GROUP BY StoreID -- czyli grupujemy po StoreID
+ORDER BY Customers desc; -- filtrowanie uzależniamy od danych w kolumnie Customers, które to są sortowane
+-- poprzez ORDER BY malejąco (bo desc)
 
--- połączenie grupowania z joinem
-SELECT sp.businessentityid, SUM(oh.SubTotal) AS SalesRevenue
-FROM Sales.Customer c
-         JOIN sales.store s on s.businessentityid = c.storeid
+
+--a teraz połączenie grupowania z joinem ???-tu jak przerobię joinowanie, powinno mi się wyjaśnić!!
+SELECT sp.businessentityid, SUM(oh.SubTotal) AS SalesRevenue -- wybierz kolumnę businessentityid ze schematu
+-- sales i tabeli salesperson (czyli: sales.salesperson sp) + zsumuj dane z kolumny SubTotal, które to pochodzą
+-- ze schematu Sales i tabeli SalesOrderHeader (Sales.SalesOrderHeader oh)
+FROM Sales.Customer c -- startując ze źródła: schemat Sales i tabela Customer zrób następujące łączenia
+         JOIN sales.store s on s.businessentityid = c.storeid --schemat sales i tabelę store nazwij jako s +
+    -- następnie już ten skrót s ma kolumnę businessentityid (s.businessentity), który to finalnie będzie
+    -- z joinowany ze schematem Sales i tabelą Customer, nazwanymi jako c, z kolumną storeid (c.storeid)
          JOIN sales.salesperson sp on s.salespersonid = sp.businessentityid
          JOIN Sales.SalesOrderHeader oh ON c.CustomerID = oh.CustomerID
-GROUP BY sp.businessentityid
+GROUP BY sp.businessentityid -- wiadomo, że żeby grupowanie mogło zajść, musi się ono odbyć po poleceniu SELECT
+-- + funkcji agregującej (u nas funkcją agregującą jest funkcja SUM)
 ORDER BY SalesRevenue DESC;
 
 
 -- TO nie zadziała
--- Spodziwamy się wyniku zwracającgo handlowców z ponad 100 klientami
+-- Spodziewamy się wyniku zwracającgo handlowców z ponad 100 klientami
 -- Dlaczego to nie działa??!
 SELECT sp.businessentityid, count(c.customerid) AS SalesRevenue
 FROM Sales.Customer c
@@ -125,7 +133,8 @@ FROM Sales.Customer c
          JOIN sales.salesperson sp on s.salespersonid = sp.businessentityid
          JOIN Sales.SalesOrderHeader oh ON c.CustomerID = oh.CustomerID
 GROUP BY sp.businessentityid
-WHERE COUNT(c.CustomerID) > 100
+WHERE COUNT(c.CustomerID) > 100 -- to nie zadziała bo zamiast Where musimy mieć Having. Nawet jak Where damy tak
+-- jak w poniższym przypdaku przed Group By, to dalej nie zadziała
 ORDER BY SalesRevenue DESC;
 
 -- WHERE musi znaleźć się przed słowem kluczowym GROUP BY (Dalej nie działa)
@@ -139,9 +148,6 @@ GROUP BY sp.businessentityid
 ORDER BY SalesRevenue DESC;
 
 
-
-
-
 -- W jaki sposób filtorwać wyniki funkcji agregujących?
 -- HAVING!! <- to pytanie pojawia się często na rozmowach kwalifikacyjnych
 -- Ale w Having nie możemy użyć naszego aliasu
@@ -152,7 +158,8 @@ FROM Sales.Customer c
          JOIN sales.salesperson sp on s.salespersonid = sp.businessentityid
          JOIN Sales.SalesOrderHeader oh ON c.CustomerID = oh.CustomerID
 GROUP BY sp.businessentityid
-HAVING count(c.customerid) > 100
+HAVING count(c.customerid) > 100 -- having = daj nam wyniki, które po zliczeniu za pomocą funkcji COUNT, dadzą
+-- nam wyniki większe od 100
 ORDER BY Customers DESC;
 
 
@@ -167,3 +174,7 @@ WHERE s.name like '%Bike%'
 GROUP BY sp.businessentityid
 HAVING count(c.customerid) > 100
 ORDER BY Customers DESC;
+
+
+
+

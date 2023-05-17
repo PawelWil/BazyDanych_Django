@@ -1,8 +1,22 @@
 -- Składnia SQL – GROUP BY
 -- 1. Jakie są średnie roczne zarobki pracowników [HumanResources.Employee] Adventure Works
 -- według stanowisk? [humanresources.employeepayhistory]
+
+select * from humanresources.employee
+select * from humanresources.EmployeePayHistory
+
+SELECT COUNT(*) AS JobTitleList, -- count + (*), liczy nam ile mamy wszystkich = '*' wierszów w kolumnie Products
+       COUNT(DISTINCT JobTitle) AS SubCategor,
+       AVG
+FROM
+       -- tu nam Count liczy ile jest unikalnych kategorii
+       -- w kolumnie 'ProductSubcategoryID' i wrzuca nam tą daną do zaliasowanej kolumny 'SubCategories'
+
+
 -- 2. Jakie jest łączne zamówienie dla każdego klienta, który kupił produkty Adventure Works w
 -- 2013 roku? [Sales.SalesOrderHeader]
+
+
 -- 3. Ile zamówień zostało złożonych przez każdego pracownika Adventure Works?
 -- [Sales.SalesOrderHeader]
 -- 4. Jaka jest łączna ilość zamówień (LineTotal) dla każdej kategorii produktów Adventure Works?
