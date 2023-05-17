@@ -1,4 +1,4 @@
---- INNER join = łączenie na bazie wspólnych części -----
+--- INNER join = łączenie na bazie wspólnych części -----test
 -- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie wspólnych cześci te tabele
 -- łączymy (only the things that match on the left and the right). Poniżej przykład łączenia tabel:
 -- Select * (wybierz nam wszystko - to się wiąże z tym, że wybierze na wszystkie kolumny z tabeli 1 i tabeli2, i je
