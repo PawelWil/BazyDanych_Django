@@ -2,7 +2,7 @@
 -- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie wspólnych cześci te tabele
 -- łączymy (only the things that match on the left and the right). Poniżej przykład łączenia tabel:
 -- Select * (wybierz nam wszystko - to się wiąże z tym, że wybierze na wszystkie kolumny z tabeli 1 i tabeli2, i je
--- pokaże(np. tab.1=5 kolumn, tab.2=7, to pokaże nam 12 kolumn) + będzie próbował połaczyć -
+-- pokaże(np. tab.1 = 5 kolumn, tab.2 = 7, to pokaże nam 12 kolumn) + będzie próbował połaczyć -
 -- tam gdzie będzie wspólny mianownik, to będą wyniki, tam gdzie nie będzie wspólnej
 -- części będzie null. Jeśli chcę żeby były tylko konkretne kolumny, to nie mogę dać ALL=*, tylko wylistować
 -- konkretne kolumny do zjoinowania. To samo się tyczy LEFT, RIGHT i FULL JOINów!!))
@@ -98,7 +98,7 @@ USE AdventureWorks2014
 -- Produkt -> SubKategoria -> Kategoria
 SELECT Production.Product.name         As ProductName, -- tu jak widać korzystamy(Selectujemy) z 3 różnych tabel:
 -- product (z tej tabeli wyciągamy nazwę PRODUKTU),productsubcategory (z tej tabeli wyciągamy nazwę podkategorii)
--- oraz ProductCategory(z tej tabeli wyciągamy nazwę kategorii) --> i z których te dane ściągamy z kolumn 'Name'.
+-- oraz ProductCategory(z tej tabeli wyciągamy nazwę kategorii) --> + z których to te dane ściągamy z kolumn 'Name'.
 -- Z tym, że te dane kryjące się w kolumnie Name, są w każdej tabeli różne - tak jak opisałem powyżej.
 -- Dodatkowo widać, że kolumnę 'name' z tabeli product, zaliasowaliśmy na 'ProductName', zaś kolumnę 'name' w tabeli
 -- productsubcategory zostawiliśmy taką samą jak oryginalnie oraz w tabeli ProductCategory kolumnę 'name'
@@ -109,7 +109,7 @@ SELECT Production.Product.name         As ProductName, -- tu jak widać korzysta
        Production.Productsubcategory.name,
        Production.ProductCategory.name AS CategoryName
 FROM production.Product -- tabela Product jest tabelą wyjściową i do niej będziemy łączyć kolejne tabele
-    -- jak wiemy można zrobić więcej niż jednego joina, w jednym całośiowym Query, żeby połączyć więcej niż
+    -- jak wiemy można zrobić więcej niż jednego joina, w jednym całościowym Query, żeby połączyć więcej niż
     -- jedną tabelę ze sobą
          INNER JOIN Production.Productsubcategory -- tu joinujemy tabelę Productsubcategory z tabelą Product. Ale
              -- żeby joinowanie zrobić, musimy to zrobić po tym samym kluczu. Więc teraz rozwijamy sobie
@@ -173,8 +173,8 @@ FROM production.Product
 -- Przy wielu łączonych tabelach na prawdę można się pogubić.
 -- Tutaj przykład aliasowania całych tabel (nie trzeba podawać słowa kluczowego as)
 SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
--- jak widać aliasowanie polega na tym, że poprzez 'p' zaliasowaliśmy 'Production(schema).Product(table)' -
--- aliasowanie tej tabeli nastąpiło w linii z FROM.
+-- jak widać tu aliasowanie polega na tym, że poprzez 'p' zaliasowaliśmy 'Production(schema).Product(table)' -
+-- finalne zdefiniowanie tego aliasowania tej tabeli nastąpiło w linii z FROM.
 -- --> 'pc' to alias dla production(schemat).productsubcategory(table) - aliasowanie tej tabeli nastąpiło
 -- w linii z pierwszym Joinem
 -- --> 'c' jest aliasem dla  dla Production(schema).ProductCategory(table) zrealizowanym w drugim Joinie.
@@ -188,25 +188,34 @@ FROM production.Product p
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid;
 
 -- WHERE i ORDER by normalnie działają na złączeniach
+-- to poniżej jest omówione powyżej:
 SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 FROM production.Product p
-         JOIN production.productsubcategory pc on pc.productcategoryid = p.productsubcategoryid
+         JOIN production.productsubcategory pc on pc.productcategoryid = p.productsubcategoryid --PrzyAliasowaniu
+-- nie musimy używac operatora 'as' - jak widać przy aliasowaniu powyżej i tu. ALe wiadomo, ze jak się je użyje
+-- to oczywiście będzie ok. ALe profesjonalni developerzy piszą kod bez 'as'.
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid
-WHERE c.name like '%Clo%'
-ORDER BY SubCategoryName desc, ProductName;
+WHERE c.name like '%Clo%' -- tu sobie sortujemy po nazwie kategorii, gdzie wiemy, że słowa mogą się zaczynać/mieć w
+-- środku / konczyć się litery 'Clo' - dla tabeli 'c', czyli ProductCategory i mowa o kolumnie Category Name
+ORDER BY SubCategoryName desc, ProductName; -- dodatkowo możemy sobie posortować inne kolumny, np. tu posortowaliśmy
+-- malejąco po nazwie (desc) kolumnę SubCategoryName, z tabeli productsubcategory + kolumnę ProductName z tabeli
+-- ProductName (to jest tez sortowanie po nazwie, ale rosnąco, bo nie daliśmy 'desc', a wiadomo że z defaultu
+-- jest przyjmowane asc
 
 
 
--- Outer joins
+-- Outer joins, czyli (1)Left, (2)Right, (3)Full -----
 
 -- Wyświetlmy liczbę klientów - 19820
 Select count(c.customerid)
 from Sales.Customer AS c;
 
--- Wyniki zawierają dane dla każdego klienta. Jeśli klient złożył zamówienie,
+-- Wyniki zawierają dane dla każdego klienta. Jeśli klient złożył zamówienie,e
 -- wyświetlany jest numer zamówienia. Klienci, którzy zarejestrowali się,
 -- ale nie złożyli zamówienia, są wyświetlani z numerem zamówienia NULL.
-SELECT c.customerid, oh.salesorderid
+SELECT c.customerid, oh.salesorderid -- tu jak widać już zostały użyte aliasy dla schematów i tabel, które dla
+-- kolumny customerid to: Sales(schemat).Customer(tabela)-zdefiniowane w linii gdzie jest 'From', zaś dla kolumny
+-- salesorderid to: Sales(schemat).SalesOrderHeader(tabela) zdefiniowane w linii 'Left Outer Join'.
 FROM Sales.Customer AS c
          LEFT OUTER JOIN Sales.SalesOrderHeader AS oh ON c.CustomerID = oh.CustomerID
 ORDER BY c.CustomerID;
