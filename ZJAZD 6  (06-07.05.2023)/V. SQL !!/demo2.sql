@@ -15,6 +15,9 @@
 
 -- Może być więcej niż jeden Join tabeli
 
+-- Te wszystkie kody dla Outer Joins(Left, Right, Full) i Inner Joins nazywają się zapytaniami = po angielsku
+-- mówimy na nie Query(Zapytanie), Queries(Zapytania).
+
 -- Odnośnie kluczy, to mamy PK = Primary Key (klucz glówny) i FK = Foreign Key. Ważne jest też to, że te Klucze
 -- muszą mieć wartości niepowtarzalne, np. nr pesel, żeby nie było sytuacji, że po połączeniu dwa różne wiersze się
 -- połączą w jeden, bo miały te same dane, np. imię - i w sumie nie wiadomo, o którego np. Pawła chodzi.
@@ -42,6 +45,12 @@
 -- ON Table_1.KEY = Table_2.KEY
   -- Co jest ważne, to na schemacie(diagramie) Bazy Danych nie zobaczę, która tabela jest tabelą lewą, a która prawą,
   -- zobaczę po prostu powiązania kluczy między nimi.
+
+  -- Jak się wchodzi z poziomu PyCharm do Diagramu: najeżdzam na bazę danych, która mnie interesuje -> prawy myszki
+  -- -> schodzę w dół i najeżdzam na 'Diagrams' -> rozwijam 'show visualization' -> i teraz daje 'ctr+f' i wpisuje
+  -- nazwę tabeli, które mnie interesuje -> i teraz już wyszukuje między tabelami, które mnie interesują kluczy,
+  -- za pomocą ktorych te tabele będę w stanie ze sobą zjoinować.
+
   -- I teraz sam sobie decyduję, która tabela będzie tą główną(przy left join = lewa Tabela).
   -- Generalnie żeby dwie tabele ze sobą połączyć, muszą mieć one wspólne keys, gdzie w jednej tabeli
   -- ten wspólny key będzie jako główny klucz = PK, zaś w drugiej ta kolumna będzie występować, ale nie będzie
@@ -248,8 +257,13 @@ WHERE oh.salesorderid is not NULL -- a tu mamy przeciwieństwo do powyższych, c
 -- czyli daj wszystkie wyniki, które nie są nullami
 ORDER BY c.CustomerID;
 
--- Lepsze rozwiązanie: Zamieniająć Łączenie tabel z LEFT -> RIGHT otrzymamy tylko klientów którzy złożyli jakieś zamówienie
--- W poprzednim przykładnie będzie więcej łączeń i będzie to mniej wydajne
+
+-- Lepsze rozwiązanie: Zamieniająć Łączenie tabel z LEFT -> RIGHT otrzymamy tylko klientów którzy złożyli jakieś
+-- zamówienie - i tu już nie trzeba korzystać z warunku 'where', gdzie przy left join, ten warunek where trzeba
+-- było zastosować, żeby rozdzielic null = brak zamówienia, od is not null = są zamówienia
+-- W poprzednim przykładzie z Left było więcej łączeń i reasumując można powiedzieć, że w tamtym przypdaku
+-- left join był mniej wydajny, ale generalnie większość by użyła lefta - mało kto używa righta, więc on balance
+-- ten left join mimo tego że troszkę dluższy jest generalnie używany i najbardziej popularny.
 SELECT c.customerid, oh.salesorderid
 FROM Sales.Customer AS c
          RIGHT OUTER JOIN Sales.SalesOrderHeader AS oh
@@ -262,7 +276,7 @@ SELECT c.customerid, oh.salesorderid
 FROM Sales.Customer AS c
          RIGHT OUTER JOIN Sales.SalesOrderHeader AS oh
                           ON c.CustomerID = oh.CustomerID
-WHERE oh.salesorderid is NULL
+WHERE oh.salesorderid is NULL -- tu dostajemy 0, bo przy zastosowaniu right joina nie ma wyników null
 ORDER BY c.CustomerID;
 
 -- Dodajemy więcej Łączeń
@@ -270,25 +284,38 @@ ORDER BY c.CustomerID;
 -- Wymagało to sekwencji połączeń od Product do SalesOrderDetail do SalesOrderHeader.
 
 SELECT p.Name As ProductName, oh.salesorderid
+-- ALIASOWANIE: (1) Alias 'p' odnosi się do kolumny 'Name', gdzie: Production(schemat).Product(Table)
+-- (2) Alias 'od' odnosi się do kolumny 'ProductID' która to będzie kluczem do połączenie z tabelą 'p',
+-- gdzie: Sales(schemat).SalesOrderDetail(Table)
+-- (3) Alias 'oh' odnosi się do kolumny 'SalesOrderID', gdzie: Sales(schemat).SalesOrderHeader(Table)
 FROM production.Product AS p
          LEFT JOIN Sales.SalesOrderDetail AS od
+-- tu jak widać po left joinie, zostały połączone tabele SalesOrderDetail z tabelą Product, za pomocą 'ON'
+-- po wspólnym kluczu ProductID, gdzie dla tabeli SalesOrderDetail jest on FK,a dla tabeli Product jest PK
                    ON p.ProductID = od.ProductID
          LEFT JOIN Sales.SalesOrderHeader AS oh
+-- Zaś tu również mamy left joina pomiędzy tabelami SalesOrderHeader a SalesOrderDetail, i połączenie nastąpiło
+-- za pomocą klucza SalesOrderID, który jest PK dla tabeli SalesOrderHeader, a FK dla tabeli SalesOrderDetail
                    ON od.SalesOrderID = oh.SalesOrderID
-ORDER BY p.ProductID;
+ORDER BY p.ProductID; -- + kolumna ProductID z tabeli Product jest posortowana rosnąco. Zwróćmy uwagę, że
+-- dlatego daliśmy sortowanie po ProductID, bo chcemy dostać listę niepowtarzalnych się productów - czyli wszystkie
+-- jakie są dostępne, a nie wszystkie jakie są, nawet te, które się powtarzają(to byśmy dostali gdybyśmy wybrali
+-- sortowanie poprzez ProductName.
 
--- Dlaczego daje nam to 0 wierszy?
+
+
+
+-- Dlaczego daje nam to 0 wierszy? -- generalnie należy unikać mieszania w jednym zapytaniu różnego typu łączeń,
+-- np. jak tutaj lewy z prawym
 SELECT DISTINCT c.CustomerID, oh.salesorderid
 from Sales.Customer AS c
          left join Sales.SalesOrderHeader As oh on c.CustomerID = oh.CustomerID
          right join Sales.SalesOrderDetail od on oh.SalesOrderID = od.SalesOrderID
 where oh.salesorderid is NULL;
-
-
 -- Te 2 złączenia wykluczają się - trzeba bardzo uważać podczas sekwencji złączeń
 -- Przeanalizujmy je po kolei
--- Po analizie wychodzi nam że przy złączeniu w linii 111 chcemy łączyć
--- wszystkie SalesOrderDetail które mają klucz główny NULL i nie da nam to żadnych wyników
+-- Po analizie wychodzi nam że przy złączeniu w linii: 'right join Sales.SalesOrderDetail od on oh.SalesOrderID = od.SalesOrderID'
+-- chcemy łączyć wszystkie SalesOrderDetail które mają klucz główny NULL i nie da nam to żadnych wyników
 
 -- Zamieniając right joina na left joina dostaniemy wyniki które chcemy otrzymać
 --      -> czyli wszystkich klientów którzy nie mają zamówienia
@@ -297,42 +324,72 @@ where oh.salesorderid is NULL;
 -- TODO SUBQUERIES
 
 -- maksymalna cena jednostkowa w Sales.SalesOrderDetail (najwyższa cena, za jaką sprzedano pojedynczy produkt).
--- MAX - jest to funkcja -> będziemy o tym mówić za chwilę
-SELECT MAX(UnitPrice)
+-- MAX - jest to funkcja
+SELECT MAX(UnitPrice) -- funkcja MAX szuka nam najwyższej ceny w kolumnie UnitProce, gdzie Sales(schemat).
+-- .SalesOrderDetail(tabela). I ona nam nie będzie sortować jak to robi Order BY, ale pokaże pojedyńczą najwyższą
+-- wartość, która nawet nie będzie przypisana do żadnej rzeczy - tylko podawana jest najwyższa wartość-ile wynosi.
+-- U nas jest to cena, ale w innych przypadkach (innech kolumnach) może to być największa długość, waga itd.
 FROM Sales.SalesOrderDetail;
 
--- Używając właśnie uruchomionego zapytania jako podzapytania otrzymamy produkty z ListPrice równą maksymalnej cenie sprzedaży.
-
+--- W poniższym Query, powyższe zapytanie=Query, wklej=imy do poniższego jako podzapytanie (SubQuery)
+-- Natomiast poniże dostaniemy nie tylko tą  pojedynczą najwyższą wartość, która nie jest przypisana do żadnej
+-- konkretnej rzeczy (zapytanie powyżej), ale listę konkretnych rzeczy, którę tą najwyższą wartość posiadają.
+-- Używając właśnie uruchomionego zapytania jako podzapytania otrzymamy produkty z ListPrice
+-- równą maksymalnej cenie sprzedaży.
 SELECT Name, ListPrice
 FROM production.Product
 WHERE ListPrice =
       (SELECT MAX(UnitPrice)
        FROM sales.SalesOrderDetail);
 
--- Znajdź produkty które były zamówione przynajmniej 20 razy
+-- Znajdź produkty które były zamówione przynajmniej 20 razy - z tym że w tym zapytaniu pokazuje nam wszystkie
+-- rekordy, które mają 20 lub więcej zamówień, nawet jak się te same ID produktu powtarza.
 SELECT ProductID
 FROM Sales.SalesOrderDetail
 WHERE OrderQty >= 20
 order by productid desc;
 
--- Tutaj zastosujmy distinct - po co nam powtórki w IN -> Bo zaraz wykorzystamy to zapytanie w sekcji IN(...)
-SELECT DISTINCT ProductID
+-- Tutaj zastosujemy distinct - po co nam powtórki, dzięki Disitinct funkcji, pokaże nam tylko IDs produktów, które
+-- miały >= ilosc zamówien i nie będzie ich powtarzał, bo jak wiemy z powyższego przrykładu, pokarze nam wszystkie
+-- zamówienia nawet tego samego ID tyle razy ile razy ta ilość była większa od 20, a wiadomo, że jeśli chodzi o
+-- różny okres czasu, to jeden ID produktu mogł mieć taką ilość zamówień 'n' razy.
+SELECT DISTINCT ProductID -- tu mamy filtr po productID, a nie po nazwie, jak jest poniżej, czyli będziemy widzieć
+-- IDs produktów
 FROM Sales.SalesOrderDetail
 WHERE OrderQty >= 20;
 
+--- W poniższym Query, zapytanie powyższe wklejamy jako podzapytanie(SubQuery)
 -- Wynik zawiera nazwy produktów, które zostały zamówione w ilości 20 lub więcej.
 -- ProductID IN
 -- Pisianie podzapytań tego typu jest bardziej wydajne niż przekazywanie gotowych ID do IN -> wynika to już z wewnętrznej implemetnacji SQL Server
-SELECT DISTINCT Name
+SELECT DISTINCT Name -- tu wybieramy wybór po name, a nie po producID, jak jest powyżej, czyli sumarycznie dostaniemy
+-- nazwy produktów, a nie ich ID + jeszcze na koncu zrobimy sortowanie po Name, czyli po ich nazwie
 FROM production.Product
-WHERE ProductID IN
+WHERE ProductID IN -- tu w tym Query, za pomocą poniższego subquery szukamy produktów (ale bez powtorzen, bo
+-- mamy funkcję  Distinct, które zostały zamówione
       (SELECT DISTINCT ProductID
        FROM Sales.SalesOrderDetail
        WHERE OrderQty >= 20)
 ORDER BY name;
 
--- A teraz ten sam wynik osiągniety w inny sposób (JOIN) -> Tutaj Pamiętamy o DISTINCT!
-SELECT DISTINCT p.Name
-FROM production.Product AS p
-         JOIN Sales.SalesOrderDetail AS o ON p.ProductID = o.ProductID
-WHERE OrderQty >= 20;
+-- A teraz ten sam wynik osiągniety w inny sposób (JOIN) -> Tutaj Pamiętamy o DISTINCT, co by nie dostać powtórek
+-- tych samych ID produktów.
+-- Generalnie można stosować SubQueries, ale najbardziej wydajną metodą jest za pomocą joinów.
+SELECT DISTINCT p.Name -- Tu jak widać dajemy od razu Distinct, co by nie mieć w wynikach powtórzeń
+-- tych samych ID produktów + jak widać również selectujemy Name, czyli będziemy selectowac=wybierać nie po
+-- ProductId , ale po nazwach. Z tym, że żeby te nazwy wyciągnąć i dostosować do odpowiednich ID produktów,
+-- musimy zrobić joina tej tabeli Produkt, w której są nazwy, ale nie ma ProductID, z tabelą SalesOrderDetail,
+-- w ktorej to mamy detale nazw
+FROM production.Product AS p -- tu sobie robimy alias 'p' dla Production(schemat).Product(tabela)
+         JOIN Sales.SalesOrderDetail AS o ON p.ProductID = o.ProductID -- i teraz po wspólnym kluczu ProductID,
+-- który jest PK dla tabeli Product i FK dla tabeli SalesOrderDetail, joinujemy sobie te tabele: Product z
+-- tabelą SalesOrderDetail
+WHERE OrderQty >= 20; -- no i oczywiście w ilości >= 20
+
+
+
+
+
+
+
+
