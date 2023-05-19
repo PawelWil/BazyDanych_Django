@@ -210,7 +210,7 @@ ORDER BY SubCategoryName desc, ProductName; -- dodatkowo możemy sobie posortowa
 Select count(c.customerid)
 from Sales.Customer AS c;
 
--- Wyniki zawierają dane dla każdego klienta. Jeśli klient złożył zamówienie,e
+-- Wyniki zawierają dane dla każdego klienta. Jeśli klient złożył zamówienie, to
 -- wyświetlany jest numer zamówienia. Klienci, którzy zarejestrowali się,
 -- ale nie złożyli zamówienia, są wyświetlani z numerem zamówienia NULL.
 SELECT c.customerid, oh.salesorderid -- tu jak widać już zostały użyte aliasy dla schematów i tabel, które dla
@@ -218,14 +218,24 @@ SELECT c.customerid, oh.salesorderid -- tu jak widać już zostały użyte alias
 -- salesorderid to: Sales(schemat).SalesOrderHeader(tabela) zdefiniowane w linii 'Left Outer Join'.
 FROM Sales.Customer AS c
          LEFT OUTER JOIN Sales.SalesOrderHeader AS oh ON c.CustomerID = oh.CustomerID
-ORDER BY c.CustomerID;
+-- i teraz robimy Left Outer Join. (1)Wpierw sprawdzam po jakich kluczach mogę te tabele: Customer + SalesOrderHeader
+-- zjoinować - więc sobie wchodzę w strukturę drzewa tych tabel i patrze na kolumny. (2)Jak widzę PK=CustomerID
+-- z tabeli Customer jest FK dla tabeli SallesOrderHeader, czyli już wiadomo, że po tym kluczy mogę te tabele
+-- ze sobą połączyć.
+-- Dodatkowo tu używam Left Joina, za pomocą którego kolumny customerid(tabela:Customer) zostanie połączona
+-- z kolumną tabelą
+ORDER BY c.CustomerID; -- tu kolumnę 'CustomerID' z tabeli Customer dodatkowo sortuje rosnąco (bo nie ma Desc,
+-- a wiadomo, że z defaultu jest ASC).
 
--- Potwierdzenie
+
+-- Potwierdzenie - tu dokładnie co powyżej, ale dodatkowo za pomocą polecenia 'where' sprawdzam czy aby na pewno
+-- jest tyle nulli ile powyżej - i jest dokładnie ta sama liczba, czyli 500.
 SELECT c.customerid, oh.salesorderid
 FROM Sales.Customer AS c
          LEFT OUTER JOIN Sales.SalesOrderHeader AS oh
                          ON c.CustomerID = oh.CustomerID
-WHERE oh.salesorderid is NULL
+WHERE oh.salesorderid is NULL -- tu daje polecenie 'where' które filtruje kolumnę salesorder z tabeli SalesOrderHeader
+-- po zamówieniach, które mają wartość null
 ORDER BY c.CustomerID;
 
 -- OK, ale chcemy otrzymać klientów którzy wykonali jakies zamówienia -> PROSTA sprawa WHERE -> TAK?
@@ -233,7 +243,9 @@ SELECT c.customerid, oh.salesorderid
 FROM Sales.Customer AS c
          LEFT OUTER JOIN Sales.SalesOrderHeader AS oh
                          ON c.CustomerID = oh.CustomerID
-WHERE oh.salesorderid is not NULL
+WHERE oh.salesorderid is not NULL -- a tu mamy przeciwieństwo do powyższych, czyli chcemy zobaczyć zamówienia
+-- które się wykonały, nie są nullami -- czyli dajemy warunek do where, ze wyselekcjonuj po 'is not null',
+-- czyli daj wszystkie wyniki, które nie są nullami
 ORDER BY c.CustomerID;
 
 -- Lepsze rozwiązanie: Zamieniająć Łączenie tabel z LEFT -> RIGHT otrzymamy tylko klientów którzy złożyli jakieś zamówienie
