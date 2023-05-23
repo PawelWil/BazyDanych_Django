@@ -58,7 +58,7 @@
   -- czyli w tej tabeli jest kluczem obcym, zapożyczonym z innej tabeli.
   -- I żeby było jasne, nawet jak już zrobię to joinowanie (np.Left), to na schemacie(diagramie) nie zobaczę,
   -- że te tabele są połączone. To jest całkiem niezależny temat - ja zobaczę takie łączenie, jak zaciągnę
-  -- taką połączoną tabelę, z bazy danych na sówj komputer. Natomiast na schemacie (diagramie) ja widzę jakie są
+  -- taką połączoną tabelę, z bazy danych na swój komputer. Natomiast na schemacie (diagramie) ja widzę jakie są
   -- tabele, jakie mają kolumny,jakie są w nich PK, a jakie FK,
   -- i które tabele za pomocą kluczy PK i FK są ze sobą powiązane - i na tą bazę danych
   -- moje Joinowanie nie ma żadnego wpływu - to jest tylko na moje wewnętrzne potrzeby.
@@ -111,7 +111,7 @@ SELECT Production.Product.name         As ProductName, -- tu jak widać korzysta
 -- Z tym, że te dane kryjące się w kolumnie Name, są w każdej tabeli różne - tak jak opisałem powyżej.
 -- Dodatkowo widać, że kolumnę 'name' z tabeli product, zaliasowaliśmy na 'ProductName', zaś kolumnę 'name' w tabeli
 -- productsubcategory zostawiliśmy taką samą jak oryginalnie oraz w tabeli ProductCategory kolumnę 'name'
--- zaliasowaliśmy na 'CategoryName'. Gdybyśmy ich nie zaliasowali, dostalibyśmy z defaultu: nazwakolumny.name, czyli:
+-- zaliasowaliśmy na 'CategoryName'. Gdybyśmy ich nie zaliasowali, dostalibyśmy z defaultu: nazwatabeli.name, czyli:
 -- 1 kolumna:Product.name, 2 kolumna:Productsubcategory.name, 3 kolumna:ProductCategory.name --> jak widać nazwy
 -- tych kolumn byłyby bardzo długie, więc dlatego je aliasujemy, żeby tabelę uprościć, a kolumny nazwać tak jak my
 -- chcemy.
@@ -126,7 +126,7 @@ FROM production.Product -- tabela Product jest tabelą wyjściową i do niej bę
              -- jakie klucze są dostępne i po jakich można zrobić łączenie tabel
              -- za pomocą operatora ON robimy łączenie tabel
                     ON Production.Productsubcategory.Productcategoryid = Production.Product.Productsubcategoryid
-    -- teraz wpierw sobie whcodzimy do kolumn tabeli Product i tam patrzymy, po której kolumnie z tabeli
+    -- teraz wpierw sobie wchodzimy do kolumn tabeli Product i tam patrzymy, po której kolumnie z tabeli
     -- Productsubcategory, jesteśmy w stanie połączyć się z tabelą Product - i jest to FK 'Productsubcategoryid'
     -- widoczny w liście kolumn tabeli Product, jako FK (niebieski kluczyk), gdzie on oczywiście jest PK w tabeli
     -- ProductSubcategory. Czyli dajemy:
@@ -180,7 +180,7 @@ FROM production.Product
 -- Zastosujemy Aliasy dla czytelności
 -- Przy łączeniu tabel szczególnie ważne jest używanie Aliasów - ułatwiają one czytelność
 -- Przy wielu łączonych tabelach na prawdę można się pogubić.
--- Tutaj przykład aliasowania całych tabel (nie trzeba podawać słowa kluczowego as)
+-- Tutaj przykład aliasowania całych tabel (WAŻNE: nie trzeba podawać słowa kluczowego 'AS')
 SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 -- jak widać tu aliasowanie polega na tym, że poprzez 'p' zaliasowaliśmy 'Production(schema).Product(table)' -
 -- finalne zdefiniowanie tego aliasowania tej tabeli nastąpiło w linii z FROM.
@@ -192,11 +192,12 @@ SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 -- ktore również jak widać powyżej zostały zaliasowane.
 -- Jak widać taki kod zamiast 8 linii zajął 4 linie - czyli jest szybszy, co nie znaczy, że np. dla mnie
 -- czytelniejszy.. ;--)
-FROM production.Product p
+FROM production.Product p -- przy aliasowaniu nie ma 'AS' bo nie ma potrzeby, ale oczywiście też może być użyte
          JOIN production.productsubcategory pc on pc.productcategoryid = p.productsubcategoryid
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid;
 
--- WHERE i ORDER by normalnie działają na złączeniach
+
+--- WHERE i ORDER by normalnie działają na złączeniach
 -- to poniżej jest omówione powyżej:
 SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 FROM production.Product p
@@ -213,11 +214,14 @@ ORDER BY SubCategoryName desc, ProductName; -- dodatkowo możemy sobie posortowa
 
 
 
--- Outer joins, czyli (1)Left, (2)Right, (3)Full -----
+--------- Outer joins, czyli (1)Left, (2)Right, (3)Full ---------
 
 -- Wyświetlmy liczbę klientów - 19820
-Select count(c.customerid)
+Select count(c.customerid) -- tu dajemy za pomocą funkcji 'count' bezpośrednie i szybkie zliczenie rekordów
+-- w Sales(schemat).Customer(table).customerid(kolumna), gdzie jako 'c' zostało zaliasowane Sales(schemat).
+-- .Customer(table)
 from Sales.Customer AS c;
+
 
 -- Wyniki zawierają dane dla każdego klienta. Jeśli klient złożył zamówienie, to
 -- wyświetlany jest numer zamówienia. Klienci, którzy zarejestrowali się,
@@ -241,8 +245,7 @@ ORDER BY c.CustomerID; -- tu kolumnę 'CustomerID' z tabeli Customer dodatkowo s
 -- jest tyle nulli ile powyżej - i jest dokładnie ta sama liczba, czyli 500.
 SELECT c.customerid, oh.salesorderid
 FROM Sales.Customer AS c
-         LEFT OUTER JOIN Sales.SalesOrderHeader AS oh
-                         ON c.CustomerID = oh.CustomerID
+         LEFT OUTER JOIN Sales.SalesOrderHeader AS oh ON c.CustomerID = oh.CustomerID
 WHERE oh.salesorderid is NULL -- tu daje polecenie 'where' które filtruje kolumnę salesorder z tabeli SalesOrderHeader
 -- po zamówieniach, które mają wartość null
 ORDER BY c.CustomerID;
@@ -325,18 +328,18 @@ where oh.salesorderid is NULL;
 
 -- maksymalna cena jednostkowa w Sales.SalesOrderDetail (najwyższa cena, za jaką sprzedano pojedynczy produkt).
 -- MAX - jest to funkcja
-SELECT MAX(UnitPrice) -- funkcja MAX szuka nam najwyższej ceny w kolumnie UnitProce, gdzie Sales(schemat).
+SELECT MAX(UnitPrice) -- funkcja MAX szuka nam najwyższej ceny w kolumnie UnitPrice, gdzie Sales(schemat).
 -- .SalesOrderDetail(tabela). I ona nam nie będzie sortować jak to robi Order BY, ale pokaże pojedyńczą najwyższą
 -- wartość, która nawet nie będzie przypisana do żadnej rzeczy - tylko podawana jest najwyższa wartość-ile wynosi.
 -- U nas jest to cena, ale w innych przypadkach (innech kolumnach) może to być największa długość, waga itd.
 FROM Sales.SalesOrderDetail;
 
---- W poniższym Query, powyższe zapytanie=Query, wklej=imy do poniższego jako podzapytanie (SubQuery)
--- Natomiast poniże dostaniemy nie tylko tą  pojedynczą najwyższą wartość, która nie jest przypisana do żadnej
--- konkretnej rzeczy (zapytanie powyżej), ale listę konkretnych rzeczy, którę tą najwyższą wartość posiadają.
+--- W poniższym Query, powyższe zapytanie=Query, wkleimy do poniższego jako podzapytanie (SubQuery)
+-- Natomiast poniżej dostaniemy nie tylko tą  pojedynczą najwyższą wartość, która nie jest przypisana do żadnej
+-- konkretnej rzeczy (zapytanie powyżej), ale listę konkretnych rzeczy, które tą najwyższą wartość posiadają.
 -- Używając właśnie uruchomionego zapytania jako podzapytania otrzymamy produkty z ListPrice
 -- równą maksymalnej cenie sprzedaży.
-SELECT Name, ListPrice
+SELECT Name, ListPrice -- tu bierzemy dane z dwóch kolumn 'Name' i 'ListPrice' z tabeli Product i schematu production
 FROM production.Product
 WHERE ListPrice =
       (SELECT MAX(UnitPrice)

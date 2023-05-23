@@ -8,12 +8,11 @@ USE AdventureWorks2014
 
 -- 1. Wybierz nazwę produktu i cenę katalogową dla wszystkich produktów w tabeli
 -- [Production.Product] i dołącz nazwę kategorii produktów [Production.ProductCategory]
-SELECT Production.Product.name,
-       Production.Product.listprice,
-       Production.ProductCategory.name
-FROM production.Product
-         JOIN production.ProductCategory
-                    ON production.product.name = Production.productcategory.Name
+select p.Name as ProductName, p.ListPrice, pc.Name as CategoryName
+    FROM Production.Product as p
+        JOIN Production.ProductSubcategory as psc ON psc.ProductCategoryID = p.ProductSubCategoryID
+        JOIN Production.ProductCategory as pc ON pc.ProductCategoryID = psc.ProductCategoryID
+
 
 -- 2. Wybierz imię, nazwisko i adres e-mail dla wszystkich pracowników w
 -- [HumanResources.Employee] i podaj nazwy działu z tabeli [HumanResources.Department]
@@ -28,6 +27,10 @@ select p.FirstName, p.LastName, d.Name FROM HumanResources.Employee e
 -- 3. Wybierz datę zamówienia, nazwa klienta (Imię + Nazwisko) i sumę należności dla wszystkich
 -- zamówień w tabeli [Sales.SalesOrderHeader], i podaj nazwę obszaru sprzedaży z tabeli
 -- [Sales.SalesTerritory]
+
+
+
+
 -- 4. Pobierz listę wszystkich klientów i odpowiadające im zamówienia sprzedaży [Sales.Customer]
 -- [Sales.SalesOrderHeader]
 -- 5. Wybierz Imię i Nazwisko wszystkich klientów [Sales.Customer] wraz z ich adresami e-mail
