@@ -1,3 +1,6 @@
+-- LINK do dokumentacji AdventureWorks2014, na bazie której mozna wyciągnąć wszystkie powiązania
+-- https://www.sqldatadictionary.com/AdventureWorks2014.pdf
+
 --- INNER join = łączenie na bazie wspólnych części -----
 -- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie wspólnych cześci te tabele
 -- łączymy (only the things that match on the left and the right). Poniżej przykład łączenia tabel:

@@ -1,10 +1,8 @@
+--pdf ze szczegółami do bazy danych AdventureWorks2014:
+-- https://www.sqldatadictionary.com/AdventureWorks2014.pdf --
+
 -------- Składnia SQL – JOINs
 USE AdventureWorks2014
--- LINK do dokumentacji AdventureWorks2014, na bazie której mozna wyciągnąć wszystkie powiązania
--- https://www.sqldatadictionary.com/AdventureWorks2014.pdf (dostępne na Teamsie co)
-
--- Prawdopodobnie na PyCharmie tych Laboratoriów nie zrobie - muszę to zrobić z MicrosoftSQL Server Managament STudio
-
 
 -- 1. Wybierz nazwę produktu i cenę katalogową dla wszystkich produktów w tabeli
 -- [Production.Product] i dołącz nazwę kategorii produktów [Production.ProductCategory]
@@ -26,7 +24,14 @@ select p.FirstName, p.LastName, d.Name FROM HumanResources.Employee e
 
 -- 3. Wybierz datę zamówienia, nazwa klienta (Imię + Nazwisko) i sumę należności dla wszystkich
 -- zamówień w tabeli [Sales.SalesOrderHeader], i podaj nazwę obszaru sprzedaży z tabeli
--- [Sales.SalesTerritory]
+-- [Sales.SalesTerrit14551szory]
+
+-- SELECT * from Sales.SalesOrderHeader
+
+SELECT soh.OrderDate, soh.TotalDue, person.person.FirstName, person.person.LastName, sales.SalesTerritory.Group
+FROM Sales.SalesOrderHeader as soh
+         JOIN sales.SalesTerritory as st on soh.TerritoryID = st.TerritoryID
+         join HumanResources.Employee as e on Person.Person.BusinessEntityID = e.BusinessEntityID
 
 
 
