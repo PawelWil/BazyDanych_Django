@@ -1,26 +1,55 @@
 -- Składnia SQL – GROUP BY
+USE AdventureWorks2014
+
+
 -- 1. Jakie są średnie roczne zarobki pracowników [HumanResources.Employee] Adventure Works
 -- według stanowisk? [humanresources.employeepayhistory]
 
-select * from humanresources.employee
-select * from humanresources.EmployeePayHistory
+SELECT e.JobTitle, -- jak już zaliasuje, to wszędzie te Aliasy dawać
+       AVG(Rate) AS Srednia
+from HumanResources.Employee as e
 
-SELECT COUNT(*) AS JobTitleList, -- count + (*), liczy nam ile mamy wszystkich = '*' wierszów w kolumnie Products
-       COUNT(DISTINCT JobTitle) AS SubCategor,
-       AVG
-FROM
-       -- tu nam Count liczy ile jest unikalnych kategorii
-       -- w kolumnie 'ProductSubcategoryID' i wrzuca nam tą daną do zaliasowanej kolumny 'SubCategories'
+         left join HumanResources.EmployeePayHistory as eph on e.BusinessEntityID = eph.BusinessEntityID
+group by JobTitle
+
+
+select *
+from humanresources.employee
+
+select *
+from humanresources.EmployeePayHistory
 
 
 -- 2. Jakie jest łączne zamówienie dla każdego klienta, który kupił produkty Adventure Works w
 -- 2013 roku? [Sales.SalesOrderHeader]
 
+select *
+from Sales.SalesOrderHeader
+
+
+select Sales.SalesOrderHeader.CustomerID,
+       sum(Sales.SalesOrderHeader.SubTotal) as WholeOrder,
+       YEAR (Sales.salesorderheader.OrderDate) as OrderYear
+
+from Sales.SalesOrderHeader
+WHERE OrderDate BETWEEN '20130101' AND '20131230'
+group by CustomerID, OrderDate
+
+-- poniżej z aliasami
+select soh.CustomerID,
+       sum(soh.SubTotal) as WholeOrder,
+       YEAR (soh.OrderDate) as OrderYear
+
+from Sales.SalesOrderHeader as soh
+WHERE OrderDate BETWEEN '20130101' AND '20131230'
+group by CustomerID, OrderDate
 
 -- 3. Ile zamówień zostało złożonych przez każdego pracownika Adventure Works?
 -- [Sales.SalesOrderHeader]
+
 -- 4. Jaka jest łączna ilość zamówień (LineTotal) dla każdej kategorii produktów Adventure Works?
 -- [Sales.SalesOrderDetail] [Production.Product]
+
 -- 5. Znajdź średnią wartość zamówienia dla każdego klienta w 2012 roku [Sales.Customer]
 -- [Sales.SalesOrderHeader]
 -- 6. Znajdź trzy najlepiej sprzedające się produkty (w największej ilości orderqty) w 2016 roku
