@@ -128,8 +128,58 @@ from Person.Address
 -- Date rosnąco
 
 
+SELECT  e.JobTitle as AllWorkers,
+        d.Name as WorkerDepartment,
+        edh.StartDate as Date
+    From HumanResources.Employee as e
+
+    LEFT JOIN HumanResources.EmployeeDepartmentHistory as edh ON e.BusinessEntityID = edh.BusinessEntityID
+    LEFT JOIN HumanResources.Department as d ON d.DepartmentID = edh.DepartmentID
+order by JobTitle desc, StartDate Asc
+
+
+
+SELECT *
+from HumanResources.Employee
+
+SELECT *
+from HumanResources.Department
+--DepartmentID(d) = DepartmentID(edh)
+
+SELECT *
+from HumanResources.EmployeeDepartmentHistory
+--BusinessEntity(edh) = BusinessEntity(e)
+
+
+
+
 -- 8. Wybierz wszystkie nazwy produktów [Production.Product] wraz z ich dostawcami (tylko
 -- nazwa) [Purchasing.Vendor]
+
+SELECT  p.Name as ProductName,
+        v.Name as PurchasingVendorName
+    from Production.Product as p
+
+    LEFT JOIN Purchasing.PurchaseOrderDetail as pod ON p.ProductID = pod.ProductID
+    Left JOIN Purchasing.PurchaseOrderHeader as poh ON poh.PurchaseOrderID = pod.PurchaseOrderID
+    Left Join Purchasing.Vendor as v ON poh.VendorID = v.BusinessEntityID
+
+
+Select *
+from Production.Product
+
+Select *
+from Purchasing.Vendor
+
+SELECT *
+from Purchasing.PurchaseOrderHeader
+
+SELECT *
+from HumanResources.EmployeeDepartmentHistory
+
+SELECT *
+from Purchasing.PurchaseOrderDetail
+
 
 -- 9. Wybierz wszystkie zamówienia pracowników [humanresources.employee] o imieniu
 -- zaczynającym się na 'E' oraz metodzie dostawy zawierającej 'OVER' [purchasing.shipmethod]
