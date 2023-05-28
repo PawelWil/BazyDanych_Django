@@ -184,6 +184,28 @@ from Purchasing.PurchaseOrderDetail
 -- 9. Wybierz wszystkie zamówienia pracowników [humanresources.employee] o imieniu
 -- zaczynającym się na 'E' oraz metodzie dostawy zawierającej 'OVER' [purchasing.shipmethod]
 
+SELECT  poh.PurchaseOrderID as AllOrders,
+        p.FirstName + ' ' + LastName as Client,
+        sm.Name as MethodOfShipmentWithOver
+    From Purchasing.PurchaseOrderHeader as poh
+
+
+    LEFT JOIN Person.Person as p ON p.BusinessEntityID = PurchaseOrderID
+    LEFT JOIN Purchasing.ShipMethod as sm ON poh.ShipMethodID = sm.ShipMethodID
+    WHERE Name LIKE '%over%' And FirstName LIKE 'e%'
+
+
+
+SELECT *
+from  purchasing.ShipMethod
+
+SELECT *
+from Purchasing.PurchaseOrderHeader
+
+SELECT *
+from Person.Person
+
+
 -- 10. Wybierz wszystkie zamówienia [Sales.SalesOrderHeader] wraz z danymi o pracownikach
 -- odpowiedzialnych za ich obsługę [HumanResources.Employee]
 
