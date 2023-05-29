@@ -195,6 +195,9 @@ SELECT p.name As ProductName, pc.name As SubCategoryName, c.name AS CategoryName
 -- ktore również jak widać powyżej zostały zaliasowane.
 -- Jak widać taki kod zamiast 8 linii zajął 4 linie - czyli jest szybszy, co nie znaczy, że np. dla mnie
 -- czytelniejszy.. ;--)
+-- !!! WAŻNE: jak zaliasujemy, to wszędzie gdzie była pełna nazwa schematu+tabeli, !!MUSI!! być zmieniona,
+-- na tą zaliasowaną, np. bylo: production.product - zaliasowano na 'p', więc dalej wszędzie, czy u góry, czy
+-- u dołu kodu ma występować alias 'p', oczywiście oprocz linii, gdzie ten alias jest definowany!
 FROM production.Product p -- przy aliasowaniu nie ma 'AS' bo nie ma potrzeby, ale oczywiście też może być użyte
          JOIN production.productsubcategory pc on pc.productcategoryid = p.productsubcategoryid
          JOIN production.ProductCategory c ON pc.productcategoryid = c.productcategoryid;
