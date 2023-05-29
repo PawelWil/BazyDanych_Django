@@ -190,7 +190,7 @@ SELECT  poh.PurchaseOrderID as AllOrders,
     From Purchasing.PurchaseOrderHeader as poh
 
 
-    LEFT JOIN Person.Person as p ON p.BusinessEntityID = PurchaseOrderID
+    LEFT JOIN Person.Person as p ON p.BusinessEntityID =poh.PurchaseOrderID
     LEFT JOIN Purchasing.ShipMethod as sm ON poh.ShipMethodID = sm.ShipMethodID
     WHERE Name LIKE '%over%' And FirstName LIKE 'e%'
 
@@ -208,6 +208,32 @@ from Person.Person
 
 -- 10. Wybierz wszystkie zamówienia [Sales.SalesOrderHeader] wraz z danymi o pracownikach
 -- odpowiedzialnych za ich obsługę [HumanResources.Employee]
+
+SELECT  soh.SalesOrderNumber as AllOrders,
+        e.JobTitle as WorkersData
+    From  Sales.SalesOrderHeader as soh
+
+
+    LEFT JOIN Purchasing.ShipMethod as sm ON soh.ShipMethodID = sm.ShipMethodID
+    LEFT JOIN Purchasing.PurchaseOrderHeader as poh ON sm.ShipMethodID = poh.ShipMethodID
+    LEFT JOIN HumanResources.Employee as e ON poh.PurchaseOrderID = e.BusinessEntityID
+
+SELECT *
+from Sales.SalesOrderHeader
+
+SELECT  *
+from HumanResources.Employee
+
+SELECT *
+from Person.Person
+
+SELECT *
+from Purchasing.PurchaseOrderHeader
+
+SELECT *
+from  purchasing.ShipMethod
+
+
 
 -- 11. Wybierz wszystkie produkty [Production.Product] z kategorii "Clothing"
 -- [production.productcategory] wraz z danymi o dostawcach[Purchasing.Vendor]
