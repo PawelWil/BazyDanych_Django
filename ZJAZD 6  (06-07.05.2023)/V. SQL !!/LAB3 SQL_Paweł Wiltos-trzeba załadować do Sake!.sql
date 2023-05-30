@@ -47,8 +47,44 @@ group by CustomerID, OrderDate
 -- 3. Ile zamówień zostało złożonych przez każdego pracownika Adventure Works?
 -- [Sales.SalesOrderHeader]
 
+SELECT  sod.OrderQty,
+        sod.ProductID,
+        sum(sod.OrderQty) as WholeOrdersAmountbyAWworkerPerProduct,
+        soh.SalesPersonID
+from Sales.SalesOrderDetail as sod
+
+    LEFT JOIN Sales.SalesOrderHeader as soh ON sod.SalesOrderID = soh.SalesOrderID
+GROUP BY  sod.OrderQty, soh.SalesPersonID, sod.ProductID
+order by SalesPersonID
+
+
+
+SELECT *
+from Sales.SalesOrderHeader
+
+SELECT *
+from Sales.SalesOrderDetail
+
+
+
 -- 4. Jaka jest łączna ilość zamówień (LineTotal) dla każdej kategorii produktów Adventure Works?
 -- [Sales.SalesOrderDetail] [Production.Product]
+
+SELECT  sod.LineTotal,
+        sum(sod.LineTotal) as WholeOrdersAmount,
+        p.Name as ProductsCategory
+From Sales.SalesOrderDetail as sod
+
+    LEFT JOIN Production.Product as p ON sod.ProductID = p.ProductID
+
+GROUP BY p.Name, sod.LineTotal
+
+
+SELECT *
+from Sales.SalesOrderDetail
+
+SELECT *
+from Production.Product
 
 -- 5. Znajdź średnią wartość zamówienia dla każdego klienta w 2012 roku [Sales.Customer]
 -- [Sales.SalesOrderHeader]
