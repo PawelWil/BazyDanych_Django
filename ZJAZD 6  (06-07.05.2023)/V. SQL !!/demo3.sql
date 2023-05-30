@@ -98,7 +98,9 @@ WHERE c.Name LIKE '%Bikes'; -- gdzie struktura 'c' w kolumnie 'Name' zawiera po 
 ------ Grupowanie danych po wykonaniu funkcji agregujących  -- 'GROUP BY' --
 -- pozwala zgrupować dane po kolumnach
 -- występuje wraz z funkcją agregującą, np. 'Count' lub 'Sum' lub 'Average' lub 'Min' lub 'Max'
--- chcąc filtrować dane po zgrupowaniu, należy zamiast 'Where', używać 'Having'
+-- chcąc filtrować dane po zgrupowaniu, należy zamiast 'Where', używać 'Having' + dajemy go zawsze po 'Group by'!
+-- zaś Where zawsze dajemy przed 'Group by', z tym że Where nie stosuje się przed funkcjami agregującymi,
+-- ale skalarnymi!
 -- Kolumny, po których chcemy wykonać grupowanie muszą znajdować się po słowie 'Select'
 
 SELECT StoreID, COUNT(CustomerID) AS Customers --wybieramy kolumne StoreID + zliczamy ilość klientów w kolumnie
@@ -109,7 +111,7 @@ ORDER BY Customers desc; -- filtrowanie uzależniamy od danych w kolumnie Custom
 -- poprzez ORDER BY malejąco (bo desc)
 
 
---a teraz połączenie grupowania z joinem ???-tu jak przerobię joinowanie, powinno mi się wyjaśnić!!
+--a teraz połączenie grupowania z joinem
 SELECT sp.businessentityid, SUM(oh.SubTotal) AS SalesRevenue -- wybierz kolumnę businessentityid ze schematu
 -- sales i tabeli salesperson (czyli: sales.salesperson sp) + zsumuj dane z kolumny SubTotal, które to pochodzą
 -- ze schematu Sales i tabeli SalesOrderHeader (Sales.SalesOrderHeader oh)
@@ -133,11 +135,14 @@ FROM Sales.Customer c
          JOIN sales.salesperson sp on s.salespersonid = sp.businessentityid
          JOIN Sales.SalesOrderHeader oh ON c.CustomerID = oh.CustomerID
 GROUP BY sp.businessentityid
-WHERE COUNT(c.CustomerID) > 100 -- to nie zadziała bo zamiast Where musimy mieć Having. Nawet jak Where damy tak
+WHERE COUNT(c.CustomerID) > 100 -- to nie zadziała bo zamiast Where musimy mieć Having. Po Group by dajemy Having.
+-- Nawet jak Where damy tak
 -- jak w poniższym przypdaku przed Group By, to dalej nie zadziała
-ORDER BY SalesRevenue DESC;
+ORDER BY SalesRevenue DESC; -- zaś Order by dajemy na końcu
 
--- WHERE musi znaleźć się przed słowem kluczowym GROUP BY (Dalej nie działa)
+-- WHERE musi znaleźć się przed słowem kluczowym GROUP BY (ale Dalej nie działa - bo musi być HAVING, gdyż jest
+-- to funkja agregująca, a nie skalarna - a jak wiemy, to funkcji agregujących stosujemy Having, które jest zawsze
+-- umieszczone po 'Group by', zaś Where dajemy przed funkcjami skalarnymi, i który jest umieszczony przed 'Group by')
 SELECT sp.businessentityid, count(c.customerid) AS SalesRevenue
 FROM Sales.Customer c
          JOIN sales.store s on s.businessentityid = c.storeid
