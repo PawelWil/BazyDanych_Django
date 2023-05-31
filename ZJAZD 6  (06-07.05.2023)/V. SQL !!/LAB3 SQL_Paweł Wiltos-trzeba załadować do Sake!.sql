@@ -140,6 +140,41 @@ from Sales.SalesOrderHeader
 
 -- 7. Znajdź średnią wartość zamówienia dla każdego kraju. Weź pod uwagę tylko klientów którzy
 -- dokonali co najmniej 10 zamówień (subquery) [Sales.Customer] [Sales.SalesOrderHeader]
+
+SELECT  st.Name as Country_Region,
+        st.SalesYTD,
+        sod.OrderQty,
+        c.CustomerID as Clients
+From Sales.SalesTerritory as st
+
+    left join Sales.Customer as c ON st.TerritoryID = c.TerritoryID
+    left join Sales.SalesOrderHeader as soh ON st.TerritoryID = soh.TerritoryID
+    left join Sales.SalesOrderDetail as sod ON soh.SalesOrderID = sod.SalesOrderID
+
+
+GROUP BY st.Name, st.SalesYTD, sod.OrderQty, c.CustomerID
+order by Clients desc
+
+
+
+
+SELECT *
+from Sales.Customer
+
+SELECT *
+from Sales.SalesOrderHeader
+
+SELECT *
+from Sales.SalesTerritory
+
+SELECT *
+from Sales.SalesOrderDetail
+
+
+
+
+
+
 -- 8. Znajdź 10 najlepszych klientów pod względem wartości zamówień (TotalDue)
 -- [Sales.Customer] [Sales.SalesOrderHeader]
 -- 9. Napisz zapytanie, aby znaleźć 5 najlepszych sprzedawców z najwyższą średnią kwotą
