@@ -143,6 +143,7 @@ from Sales.SalesOrderHeader
 
 SELECT  st.Name as Country_Region,
         st.SalesYTD,
+--         avg(st.SalesYTD) as AverageSumOfOrders,
         sod.OrderQty,
         c.CustomerID as Clients
 From Sales.SalesTerritory as st
@@ -151,9 +152,10 @@ From Sales.SalesTerritory as st
     left join Sales.SalesOrderHeader as soh ON st.TerritoryID = soh.TerritoryID
     left join Sales.SalesOrderDetail as sod ON soh.SalesOrderID = sod.SalesOrderID
 
-
+WHERE sod.OrderQty >= 10
 GROUP BY st.Name, st.SalesYTD, sod.OrderQty, c.CustomerID
-order by Clients desc
+-- HAVING count(st.SalesYTD)
+order by sod.OrderQty
 
 
 
