@@ -86,10 +86,58 @@ from Sales.SalesOrderDetail
 SELECT *
 from Production.Product
 
--- 5. Znajdź średnią wartość zamówienia dla każdego klienta w 2012 roku [Sales.Customer]
+-- 5 (??). Znajdź średnią wartość zamówienia dla każdego klienta w 2012 roku [Sales.Customer]
 -- [Sales.SalesOrderHeader]
--- 6. Znajdź trzy najlepiej sprzedające się produkty (w największej ilości orderqty) w 2016 roku
+
+SELECT  soh.SubTotal as WholeSumOfOrders,
+        avg(soh.SubTotal) as AverageSumOfOrders,
+        soh.OrderDate,
+        YEAR(soh.OrderDate) AS Order2012Date,
+        c.CustomerID
+    FROM Sales.SalesOrderHeader as soh
+
+    LEFT JOIN Sales.Customer as c ON soh.CustomerID = c.CustomerID
+WHERE OrderDate = '2012'
+GROUP BY soh.SubTotal, soh.OrderDate, c.CustomerID
+
+
+Select *
+from Sales.Customer
+
+SELECT *
+from Sales.SalesOrderHeader
+
+
+
+-- 6. Znajdź trzy najlepiej sprzedające się produkty (w największej ilości orderqty) w 2016 (???-użyłem 2012,
+-- bo danych na 2016 rok nie ma..).
 -- [Production.Product] [Sales.SalesOrderDetail] [Sales.SalesOrderHeader]
+
+SELECT  p.Name as ProductName,
+        p.SellEndDate,
+        YEAR(p.SellEndDate) AS Order2012Date,
+--         sod.OrderQty,
+        MAX(sod.OrderQty) as MAXOrderQuantity
+FROM Production.Product as p
+
+    LEFT JOIN Sales.SalesOrderDetail as sod ON p.ProductID = sod.ProductID
+WHERE SellEndDate >= '20120101' AND SellEndDate <= '20121231'
+GROUP BY p.Name, p.SellEndDate, YEAR(p.SellEndDate), sod.OrderQty
+ORDER BY sod.OrderQty desc
+
+SELECT *
+from Production.Product
+
+SELECT *
+from Sales.SalesOrderDetail
+
+SELECT *
+from Sales.SalesOrderHeader
+
+
+
+
+
 -- 7. Znajdź średnią wartość zamówienia dla każdego kraju. Weź pod uwagę tylko klientów którzy
 -- dokonali co najmniej 10 zamówień (subquery) [Sales.Customer] [Sales.SalesOrderHeader]
 -- 8. Znajdź 10 najlepszych klientów pod względem wartości zamówień (TotalDue)
