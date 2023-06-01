@@ -113,7 +113,7 @@ from Sales.SalesOrderHeader
 -- bo danych na 2016 rok nie ma..).
 -- [Production.Product] [Sales.SalesOrderDetail] [Sales.SalesOrderHeader]
 
-SELECT  p.Name as ProductName,
+SELECT  top 3 p.Name as ProductName,
         p.SellEndDate,
         YEAR(p.SellEndDate) AS Order2012Date,
 --         sod.OrderQty,
@@ -179,10 +179,89 @@ from Sales.SalesOrderDetail
 
 -- 8. Znajdź 10 najlepszych klientów pod względem wartości zamówień (TotalDue)
 -- [Sales.Customer] [Sales.SalesOrderHeader]
+
+SELECT Top 10 c.CustomerID as TheBestClients_10,
+        soh.TotalDue
+FROM Sales.Customer as c
+
+ join Sales.SalesOrderHeader as soh ON c.CustomerID = soh.CustomerID
+
+
+
+SELECT *
+from Sales.Customer
+
+SELECT *
+from Sales.SalesOrderHeader
+
+
+
+
+
+
+
 -- 9. Napisz zapytanie, aby znaleźć 5 najlepszych sprzedawców z najwyższą średnią kwotą
 -- sprzedaży na zamówienie, i uwzględnij ich Imię, Nazwisko i średnią kwotę sprzedaży na
 -- zamówienie. Uporządkuj wyniki według średniej wielkości sprzedaży na zamówienie w
 -- kolejności malejącej [Sales.SalesPerson] [Sales.SalesOrderHeader] [Sales.SalesOrderDetail]
+
+SELECT  top 5 p.FirstName + ' ' + LastName as SalesName,
+        AVG(soh.SubTotal) as AvgSalesForTheBestSeller
+FROM Sales.SalesOrderHeader as soh
+LEFT JOIN Person.Person as p ON soh.SalesPersonID = p.BusinessEntityID
+
+group by soh.TotalDue, soh.SubTotal, p.FirstName + ' ' + LastName
+ORDER BY SubTotal desc
+
+
+
+WHERE Person.person.FirstName IN -- tu w tym Query, za pomocą poniższego subquery szukamy produktów (ale bez powtorzen, bo
+-- mamy funkcję  Distinct, które zostały zamówione
+      (SELECT DISTINCT Person.person.FirstName + ' ' + LastName as FirstNameLastName
+       FROM person.person)
+
+group by soh.TotalDue, soh.SubTotal, Person.person.FirstName + ' ' + LastName
+ORDER BY SubTotal desc
+
+
+
+
+SELECT top 5 AVG(soh.SubTotal) as AvgSalesForTheBestSeller
+
+FROM Sales.SalesOrderHeader as soh
+
+WHERE Person.person.FirstName IN -- tu w tym Query, za pomocą poniższego subquery szukamy produktów (ale bez powtorzen, bo
+-- mamy funkcję  Distinct, które zostały zamówione
+      (SELECT DISTINCT Person.person.FirstName + ' ' + LastName as FirstNameLastName
+       FROM person.person)
+
+
+-- LEFT JOIN Person.Person as p ON soh.SalesPersonID = p.BusinessEntityID
+group by soh.TotalDue, soh.SubTotal, Person.person.FirstName + ' ' + LastName
+ORDER BY SubTotal desc
+
+
+
+SELECT *
+from Sales.SalesPerson
+
+SELECT *
+from Sales.SalesOrderHeader
+
+SELECT *
+from Sales.SalesOrderDetail
+
+SELECT *
+from Person.Person
+
+
+
+
+
+
+
+
+
 -- 10. Napisz zapytanie, aby znaleźć 10 najlepszych produktów o najwyższej łącznej wartości
 -- sprzedaży i podaj nazwę produktu, kategoria produktu i łączna kwota sprzedaży. Posortuj
 -- wyniki według łącznej kwoty sprzedaży w kolejności malejącej [Production.Product]
