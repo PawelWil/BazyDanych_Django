@@ -67,7 +67,21 @@ where TerritoryID = 8 order by PersonID
 -- 12. Wybierz produkty z kategorii "Components" i posortuj je według nazwy. (3 zapytania)
 -- [Production.Product]
 
-SELECT components from Production.p
+SELECT  p.Name as NameOfProduct,
+        bom.ComponentID as IDofComponent
+
+from production.BillOfMaterials as bom
+
+    left join Production.Product as p ON bom.ComponentID = p.ProductID
+
+ORDER BY p.Name
+
+
+SELECT *
+from production.Product
+
+SELECT *
+from Production.BillOfMaterials
 
 
 
@@ -89,11 +103,21 @@ where CustomerID='29485' order by OrderDate desc
 -- 15. Wybierz wszystkie zamówienia, które mają metodę dostawy "OVERSEAS - DELUXE" lub
 -- "CARGO TRANSPORT 5" i posortuj je według daty wysyłki. (2 zapytania)
 -- [Sales.SalesOrderHeader]
-SELECT ShipMethodID, Name from Purchasing.ShipMethod
-where Name = 'OVERSEAS - DELUXE' or Name = 'CARGO TRANSPORT 5'
 
-SELECT * from  Sales.SalesOrderHeader
-where ShipMethodID = 5 or ShipMethodID = 3 order by ShipDate
+SELECT  sm.Name as MethodOfShipment,
+        soh.ShipDate as DateOfShipment
+from Purchasing.ShipMethod as sm
+
+LEFT JOIN Sales.SalesOrderHeader as soh ON sm.ShipMethodID = soh.ShipMethodID
+
+where sm.Name = 'OVERSEAS - DELUXE' or Name = 'CARGO TRANSPORT 5'
+order by soh.ShipDate
+
+SELECT *
+from Sales.SalesOrderHeader
+
+SELECT *
+from Purchasing.ShipMethod
 
 
 -- 16. Wybierz wszystkie produkty o nazwie zawierającej słowo "bike" i posortuj je według nazwy w

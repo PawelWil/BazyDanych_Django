@@ -255,14 +255,34 @@ SELECT *
 from Person.Person
 
 
-
-
-
-
-
-
-
 -- 10. Napisz zapytanie, aby znaleźć 10 najlepszych produktów o najwyższej łącznej wartości
 -- sprzedaży i podaj nazwę produktu, kategoria produktu i łączna kwota sprzedaży. Posortuj
 -- wyniki według łącznej kwoty sprzedaży w kolejności malejącej [Production.Product]
 -- [Production.ProductSubcategory] [Sales.SalesOrderDetail]
+
+SELECT   top 10 pc.Name as CategoryOfProduct,
+         p.Name as NameOfProduct,
+         sod.LineTotal as ProductWithTheHighestSales
+
+From Sales.SalesOrderDetail as sod
+
+    left join Production.Product as p ON sod.ProductID = p.ProductID
+    left join Production.ProductSubcategory as ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
+    left join Production.ProductCategory as pc ON ps.ProductCategoryID = pc.ProductCategoryID
+
+group by sod.LineTotal, p.Name, pc.Name
+order by LineTotal desc
+
+
+SELECT *
+from Production.Product
+
+SELECT *
+from Production.ProductSubcategory
+
+SELECT *
+from Production.ProductCategory
+
+SELECT *
+from Sales.SalesOrderDetail
+
