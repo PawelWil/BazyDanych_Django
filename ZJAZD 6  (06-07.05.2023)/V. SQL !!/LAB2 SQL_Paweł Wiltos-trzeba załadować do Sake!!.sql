@@ -185,8 +185,8 @@ SELECT poh.PurchaseOrderID          as AllOrders,
 From Purchasing.PurchaseOrderHeader as poh
 
 
-         LEFT JOIN Person.Person as p ON p.BusinessEntityID = poh.PurchaseOrderID
-         LEFT JOIN Purchasing.ShipMethod as sm ON poh.ShipMethodID = sm.ShipMethodID
+        LEFT JOIN Person.Person as p ON p.BusinessEntityID = poh.PurchaseOrderID
+        LEFT JOIN Purchasing.ShipMethod as sm ON poh.ShipMethodID = sm.ShipMethodID
 WHERE Name LIKE '%over%'
   And FirstName LIKE 'e%'
 
@@ -200,6 +200,8 @@ from Purchasing.PurchaseOrderHeader
 SELECT *
 from Person.Person
 
+SELECT *
+from HumanResources.Employee
 
 -- 10. Wybierz wszystkie zamówienia [Sales.SalesOrderHeader] wraz z danymi o pracownikach
 -- odpowiedzialnych za ich obsługę [HumanResources.Employee]
@@ -229,7 +231,7 @@ SELECT *
 from purchasing.ShipMethod
 
 
--- 11 (??). Wybierz wszystkie produkty [Production.Product] z kategorii "Clothing"
+-- 11. Wybierz wszystkie produkty [Production.Product] z kategorii "Clothing"
 -- [production.productcategory] wraz z danymi o dostawcach[Purchasing.Vendor]
 
 SELECT p.Name  as AllProducts,
@@ -237,9 +239,12 @@ SELECT p.Name  as AllProducts,
        v.Name  as SuppliersName
 from Production.Product as p
 
-         LEFT JOIN Production.ProductSubcategory as ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
-         LEFT JOIN Production.ProductCategory as pc ON ps.ProductCategoryID = pc.ProductCategoryID
-         Left Join Purchasing.Vendor as v ON p.ProductID = v.BusinessEntityID
+        LEFT JOIN Production.ProductSubcategory as ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
+        LEFT JOIN Production.ProductCategory as pc ON ps.ProductCategoryID = pc.ProductCategoryID
+        Left Join Purchasing.ProductVendor as pv ON p.ProductID = pv.ProductID
+        Left Join Purchasing.Vendor as v ON pv.BusinessEntityID = v.BusinessEntityID
+
+
 WHERE pc.Name = 'Clothing'
 
 
@@ -251,6 +256,9 @@ from Production.ProductCategory
 
 SELECT *
 from Purchasing.Vendor
+
+SELECT *
+from Purchasing.ProductVendor
 
 SELECT *
 from Purchasing.PurchaseOrderHeader
@@ -265,17 +273,27 @@ SELECT *
 from Purchasing.PurchaseOrderHeader
 
 -- 12. Wybierz wszystkie zamówienia złożone w 2008 roku wraz z danymi o klientach.
--- [Sales.SalesOrderHeader] [Sales.Customer]
+-- [Sales.SalesOrderHeader] [Sales.Customer] --> bład w dacie, minimum od 2011.
 
 SELECT soh.OrderDate as OrderDATES,
        c.CustomerID  as ClientsID
 from Sales.SalesOrderHeader as soh
 
          left join Sales.Customer as c ON soh.CustomerID = c.CustomerID
-WHERE c.CustomerID between '20080101' and '20081230'
--- nie ma dat poniżej 2011, więc dlatego jest zawsze Null
+WHERE soh.OrderDate between '20080101' and '20081230'
+-- nie ma dat poniżej 2011, więc dlatego się nic nie wyświetla
 -- w kolumnie OrderDates
 
+
+
+
+SELECT soh.OrderDate as OrderDATES,
+       c.CustomerID  as ClientsID
+from Sales.SalesOrderHeader as soh
+
+         left join Sales.Customer as c ON soh.CustomerID = c.CustomerID
+WHERE soh.OrderDate between '20120101' and '20121231'
+-- teraz jest data np. 2012
 
 SELECT *
 from Sales.SalesOrderHeader
@@ -291,8 +309,9 @@ SELECT p.ListPrice as DetalPriceBiggerThan25$,
        p.Name,
        v.Name      as SupplierName
 From Production.Product as p
+         LEFT JOIN Purchasing.ProductVendor as pv ON p.ProductID = pv.ProductID
+         LEFT JOIN Purchasing.Vendor as v ON v.BusinessEntityID = pv.BusinessEntityID
 
-         LEFT JOIN Purchasing.Vendor as v ON v.BusinessEntityID = p.ProductID
 WHERE p.ListPrice > 25
 ORDER BY p.ListPrice desc
 
