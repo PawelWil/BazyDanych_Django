@@ -150,12 +150,10 @@ from Sales.SalesOrderHeader
 
 
 
-
-
 -- 7. Znajdź średnią wartość zamówienia dla każdego kraju. Weź pod uwagę tylko klientów którzy
 -- dokonali co najmniej 10 zamówień (subquery) [Sales.Customer] [Sales.SalesOrderHeader]
 
-----z wykorzystanem subquery-----------
+----z wykorzystaniem subquery-----------
 --Tu mamy pierwszą część subquery, zaś drugą część subquery zaczynamy od bloku 'where'
 SELECT st.Name as NameOfCountry,
     avg(soh.TotalDue) as OrderAverage
@@ -231,9 +229,6 @@ from Sales.Customer
 
 SELECT *
 from Sales.SalesOrderHeader
-
-
-
 
 
 

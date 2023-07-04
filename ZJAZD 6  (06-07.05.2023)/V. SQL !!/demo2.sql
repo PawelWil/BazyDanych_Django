@@ -1,6 +1,15 @@
 -- LINK do dokumentacji AdventureWorks2014, na bazie której mozna wyciągnąć wszystkie powiązania
 -- https://www.sqldatadictionary.com/AdventureWorks2014.pdf
 
+-- !!!!!!!!!!!!!Odpalenie różnych queries - JAK TO ROBIĆ!!!!!!!!
+-- Najpierw muszę odpalić bazę danych (AdventureWorks2014) poprzez:
+-- Use AdventureWorks2014 (zaznaczam i daję ctrl+ent) --> wybieram session morfeusz + new session(to w tym
+-- przypadku tyko)
+-- !!!Zeby uruchomić kod, zaznaczam go --> daję ctrl+ent --> session morfeusz + new session
+-- SELECT Product.Name --> tu z tabeli 'Produkt', biorę kolumnę 'Name'
+-- from Production.Product --> 'from', czyli z bazy danych 'Production', tabeli 'Product'
+
+
 --- INNER join = łączenie na bazie wspólnych części -----
 -- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie wspólnych cześci te tabele
 -- łączymy (only the things that match on the left and the right). Poniżej przykład łączenia tabel:
@@ -105,10 +114,10 @@
 -- przykład wykorzystania Inner Join
 USE AdventureWorks2014
 
-
 -- przykład wykorzystania Inner Join
 -- Produkt -> SubKategoria -> Kategoria
-SELECT Production.Product.name         As ProductName, -- tu jak widać korzystamy(Selectujemy) z 3 różnych tabel:
+SELECT Production.Product.name         As ProductName, -- tu jak widać korzystamy(Selectujemy) z Production DB
+-- z 3 różnych tabel różne kolumny:
 -- product (z tej tabeli wyciągamy nazwę PRODUKTU),productsubcategory (z tej tabeli wyciągamy nazwę podkategorii)
 -- oraz ProductCategory(z tej tabeli wyciągamy nazwę kategorii) --> + z których to te dane ściągamy z kolumn 'Name'.
 -- Z tym, że te dane kryjące się w kolumnie Name, są w każdej tabeli różne - tak jak opisałem powyżej.

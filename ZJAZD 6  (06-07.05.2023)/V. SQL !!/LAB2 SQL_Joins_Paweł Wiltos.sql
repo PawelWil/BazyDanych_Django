@@ -1,5 +1,8 @@
 --pdf ze szczegółami do bazy danych AdventureWorks2014:
 -- https://www.sqldatadictionary.com/AdventureWorks2014.pdf --
+-- !!!Zeby uruchomić kod, zaznaczam go --> daję ctr+ent -->
+-- SELECT Product.Name --> tu z tabeli 'Produkt', kolumnę 'Name'
+-- from Production.Product --> z bazy danych 'Production', tabeli 'Product'
 
 -------- Składnia SQL – JOINs
 USE AdventureWorks2014
@@ -322,7 +325,8 @@ from Production.Product
 SELECT *
 from Purchasing.Vendor
 
-
+SELECT *
+from Purchasing.ProductVendor
 
 
 
