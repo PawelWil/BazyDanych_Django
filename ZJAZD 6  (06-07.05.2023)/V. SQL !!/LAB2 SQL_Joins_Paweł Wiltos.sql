@@ -2,7 +2,10 @@
 -- https://www.sqldatadictionary.com/AdventureWorks2014.pdf --
 -- !!!Zeby uruchomić kod, zaznaczam go --> daję ctr+ent -->
 -- SELECT Product.Name --> tu z tabeli 'Produkt', kolumnę 'Name'
--- from Production.Product --> z bazy danych 'Production', tabeli 'Product'
+-- from Production.Product --> z bazy danych AdventureWorks2014(ten schemat jest uruchomiony powyzej),
+-- ze schematu 'Production', tabeli 'Product'. Ale jak nie ma schematów, to od razu Production jest Bazą Danych.
+-- tu tak jest bo ta baza jest mega rozbudowana i zanim dojdziemy do tabeli musimy wejsć w DB, a potem w schemat
+
 
 -------- Składnia SQL – JOINs
 USE AdventureWorks2014
