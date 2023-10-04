@@ -1,3 +1,11 @@
+-- Jak DODAWAĆ nowe bazy danych:
+-- otwieram po prawej 'DataBase' -> rozwijam '+' -> wybieram 'Data source' -> wybieram silnik,
+-- który obsługuje daną DB, np. niech to będzie Microsoft SQL Server -> wpisuje name
+-- -> host daje taki jaki jest zeby się połączyć z tą bazą danych, czyli jest ona przetrzymywanana na serwerze np.
+-- 'morfeusz.wszib.edu.pl -> Port: nie daje nic - wypełni sie automatycznie -> user, daje taki, jaki jest żeby się z tą bazą
+-- danych połączyć, np.wiltos + hasło -> i na koniec mogę sobie zrobić test połączenia (lewy dolny róg)
+
+
 ----------------------------------------------
 -- SELECT
 -- SSMS pomaga konstruować zapytania- kolorując
