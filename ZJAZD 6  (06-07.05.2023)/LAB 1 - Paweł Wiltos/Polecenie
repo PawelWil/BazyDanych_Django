@@ -1,5 +1,6 @@
 Napisz program konsolowy który:
-1.	Podczas uruchomienia wczyta dane z pliku ingredients.csv i zachowa je w wybranej przez siebie strukturze danych
+1.	Podczas uruchomienia wczyta dane z pliku ingredients.csv i zachowa je w wybranej
+przez siebie strukturze danych
 2.	Po uruchomieniu w konsoli wyświetli menu z 4 możliwościami
 1 – Dodanie nowego składnika
 2 – Wyświetlenie wszystkich składników
