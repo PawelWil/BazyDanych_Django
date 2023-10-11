@@ -3,7 +3,8 @@
 
 -- !!!!!!!!!!!!!Odpalenie różnych queries - JAK TO ROBIĆ!!!!!!!!
 -- Najpierw muszę odpalić bazę danych (AdventureWorks2014) poprzez:
--- Use AdventureWorks2014 (zaznaczam i daję ctrl+ent) --> wybieram session morfeusz + new session(to w tym
+-- Use AdventureWorks2014 (zaznaczam i daję ctrl+ent) --> wybieram session morfeusz
+-- + new session(to w tym
 -- przypadku tyko)
 -- !!!Zeby uruchomić kod, zaznaczam go --> daję ctrl+ent --> session morfeusz + new session
 -- SELECT Product.Name --> tu z tabeli 'Produkt', biorę kolumnę 'Name'
@@ -11,72 +12,100 @@
 
 
 --- INNER join = łączenie na bazie wspólnych części -----
--- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie wspólnych cześci te tabele
+-- łączenie tych danych, które zarówno występują w tabeli 1 i tabeli 2, czyli na bazie
+-- wspólnych cześci te tabele
 -- łączymy (only the things that match on the left and the right). Poniżej przykład łączenia tabel:
--- Select * (wybierz nam wszystko - to się wiąże z tym, że wybierze na wszystkie kolumny z tabeli 1 i tabeli2, i je
--- pokaże(np. tab.1 = 5 kolumn, tab.2 = 7, to pokaże nam 12 kolumn) + będzie próbował połaczyć -
+-- Select * (wybierz nam wszystko - to się wiąże z tym, że wybierze nam wszystkie kolumny
+-- z tabeli 1 i tabeli2, i je pokaże(np. tab.1 = 5 kolumn, tab.2 = 7, to pokaże nam 12 kolumn)
+-- + będzie próbował połaczyć -
 -- tam gdzie będzie wspólny mianownik, to będą wyniki, tam gdzie nie będzie wspólnej
--- części będzie null. Jeśli chcę żeby były tylko konkretne kolumny, to nie mogę dać ALL=*, tylko wylistować
--- konkretne kolumny do zjoinowania. To samo się tyczy LEFT, RIGHT i FULL JOINów!!))
--- From Table_1 (z tabeli 1 - - wiadomo, że zarówno przy tabeli 1 i 2 trzeba  podać: schemat.tabela 1)
--- INNER JOIN Table_2 (tu jaki rodzaj łączenia tabel=INNER JOIN+która to tabela ma być połączona(tabela 2)zTabelą 1
--- ON Table_1.KEY = Table_2.KEY (ON = łączenie, tabeli 1, na bazie jakiegoś wspólnego klucza(tu KEY), który piszemy
--- po kropce, za nazwą tabeli  --> i teraz dajemy
+-- części będzie null. Jeśli chcę żeby były tylko konkretne kolumny, to nie mogę dać ALL=*,
+-- tylko wylistować konkretne kolumny do zjoinowania.
+-- To samo się tyczy LEFT, RIGHT i FULL JOINów!!))
+-- From Table_1 (z tabeli 1 - - wiadomo, że zarówno przy tabeli 1 i 2 trzeba  podać:
+-- schemat.tabela 1)
+-- INNER JOIN Table_2 (tu jaki rodzaj łączenia tabel=INNER JOIN+która to tabela ma być
+-- połączona(tabela 2)zTabelą 1
+-- ON Table_1.KEY = Table_2.KEY (ON = łączenie, tabeli 1, na bazie jakiegoś wspólnego klucza
+-- (tu KEY = wspolnej kolumny, która dla jednej tabeli jest 'Primary Key', a dla drugiej
+-- tabeli to będzie 'Foreign Key', który jest 'Primary Key' dla tej 1-ej tabeli ),
+-- który piszemy po kropce, za nazwą tabeli  --> i teraz dajemy
 -- znak '=' i wpisuje nazwę drugiej tabeli wraz z kluczem, która ma być połączona z pierwszą tabelą,
 -- bo to jest przyrównanie tych tabel, żeby się one w konsekwencji połączyły.
 
 -- Może być więcej niż jeden Join tabeli
 
--- Te wszystkie kody dla Outer Joins(Left, Right, Full) i Inner Joins nazywają się zapytaniami = po angielsku
+-- Te wszystkie kody dla Outer Joins(Left, Right, Full) i Inner Joins nazywają się zapytaniami
+-- = po angielsku
 -- mówimy na nie Query(Zapytanie), Queries(Zapytania).
 
--- Odnośnie kluczy, to mamy PK = Primary Key (klucz glówny) i FK = Foreign Key. Ważne jest też to, że te Klucze
--- muszą mieć wartości niepowtarzalne, np. nr pesel, żeby nie było sytuacji, że po połączeniu dwa różne wiersze się
--- połączą w jeden, bo miały te same dane, np. imię - i w sumie nie wiadomo, o którego np. Pawła chodzi.
--- I teraz jak łączymy 2 tabele, to klucz pierwszej tabeli która jest punktem odniesienia, to PK,
+-- Odnośnie kluczy, to mamy PK = Primary Key (klucz glówny) i FK = Foreign Key.
+-- Ważne jest też to, że te Klucze
+-- muszą mieć wartości niepowtarzalne, np. nr pesel, żeby nie było sytuacji,
+-- że po połączeniu dwa różne wiersze się
+-- połączą w jeden, bo miały te same dane, np. imię - i w sumie nie wiadomo, o którego
+-- np. Pawła chodzi.
+-- I teraz jak łączymy 2 tabele, to klucz pierwszej tabeli która jest punktem odniesienia,
+-- to PK,
 -- zaś tabela2, która jest dołączana, jest dołączana
--- na bazie jej FK, który jest u niej (ta nazwa kolumny, która jest PK w tabeli 1), ale nie jest on jej PK,
+-- na bazie jej FK, który jest u niej (ta nazwa kolumny, która jest PK w tabeli 1), ale nie
+-- jest on jej PK,
 -- tylko jest ta kolumna w niej, ale ta kolumna jest PK dla tabeli 1.
 -- Ważne - Key = to nazwa kolumny, nie wiersza!
 
--- Generalnie jest dobrze aliasować tabelę, żeby potem były po pierwsze łatwo rozpoznawalne tabele + nie trzeba było
--- długich nazw przepisywać. Mogą to być nawet aliasy składające się z pary liter, ktore są początkami elementów
--- nazwy tabeli
+-- Generalnie jest dobrze aliasować tabelę, żeby potem były po pierwsze łatwo rozpoznawalne
+-- tabele + nie trzeba było
+-- długich nazw przepisywać. Mogą to być nawet aliasy składające się z pary liter,
+-- ktore są początkami elementów nazwy tabeli
 
---- LEFT Outer Join = everything on the left table  + anything on the right that matches based on common KEY
--- Tu dostajemy wszystko co jest po lewej stronie(Tabela 1),łącznie z częścią wspólną tego co jest po prawej(Tab 2)
--- Ważna uwaga, po złączeniu tabel, jeśli np. jakiś Klient nie ma żadnego zamówienia, to do połączenia tabel dojdzie
--- po wspólnym Key-u (nazwie kolumny), ale wtedy po prostu po połączeniu tych tabel wyświetli się 'null', co
--- nie jest błędem.
+--- LEFT Outer Join = everything on the left table  + anything on the right that matches
+-- based on common KEY
+-- Tu dostajemy wszystko co jest po lewej stronie(Tabela 1),łącznie z częścią wspólną tego
+-- co jest po prawej(Tab 2)
+-- Ważna uwaga, po złączeniu tabel, jeśli np. jakiś Klient nie ma żadnego zamówienia,
+-- to do połączenia tabel dojdzie
+-- po wspólnym Key-u (nazwie kolumny), ale wtedy po prostu po połączeniu tych tabel
+-- wyświetli się 'null', co nie jest błędem.
+
 -- Poniżej przykład Lewego Joina:
 -- Select *
 -- From Table_1  (to jest nasza lewa tabela, użyta jako pierwsza, poprzez zastosowanie 'From')
    -- - wiadomo, że zarówno przy tabeli 1 i 2 trzeba  podać: schemat.tabela 1
--- Left Join Table_2 (to jest prawa tabela, która będzie dołączana do lewej) -- nie trzeba pisać OUTER,
+-- Left Join Table_2 (to jest prawa tabela, która będzie dołączana do lewej) -- nie trzeba
+-- pisać OUTER,
    -- wystarczy że wpiszemy Left Join lub Right Join
 -- ON Table_1.KEY = Table_2.KEY
-  -- Co jest ważne, to na schemacie(diagramie) Bazy Danych nie zobaczę, która tabela jest tabelą lewą, a która prawą,
+  -- Co jest ważne, to na schemacie(diagramie) Bazy Danych nie zobaczę, która tabela jest
+  -- tabelą lewą, a która prawą,
   -- zobaczę po prostu powiązania kluczy między nimi.
 
-  -- Jak się wchodzi z poziomu PyCharm do Diagramu: najeżdzam na bazę danych, która mnie interesuje -> prawy myszki
+  -- Jak się wchodzi z poziomu PyCharm do Diagramu: najeżdzam na bazę danych, która mnie
+  -- interesuje -> prawy myszki
   -- -> schodzę w dół i najeżdzam na 'Diagrams' -> rozwijam 'show visualization' -> i teraz daje 'ctr+f' i wpisuje
   -- nazwę tabeli, które mnie interesuje -> i teraz już wyszukuje między tabelami, które mnie interesują kluczy,
   -- za pomocą ktorych te tabele będę w stanie ze sobą zjoinować.
 
   -- I teraz sam sobie decyduję, która tabela będzie tą główną(przy left join = lewa Tabela).
-  -- Generalnie żeby dwie tabele ze sobą połączyć, muszą mieć one wspólne keys, gdzie w jednej tabeli
-  -- ten wspólny key będzie jako główny klucz = PK, zaś w drugiej ta kolumna będzie występować, ale nie będzie
-  -- głównym kluczem, bo ona będzie miała inny PK, a będzie FK, a dlatego FK, bo w innej tabeli jest PK,
+  -- Generalnie żeby dwie tabele ze sobą połączyć, muszą mieć one wspólne keys, gdzie w
+  -- jednej tabeli
+  -- ten wspólny key będzie jako główny klucz = PK, zaś w drugiej ta kolumna będzie
+  -- występować, ale nie będzie
+  -- głównym kluczem, bo ona będzie miała inny PK, a będzie FK, a dlatego FK,
+  -- bo w innej tabeli jest PK,
   -- czyli w tej tabeli jest kluczem obcym, zapożyczonym z innej tabeli.
-  -- I żeby było jasne, nawet jak już zrobię to joinowanie (np.Left), to na schemacie(diagramie) nie zobaczę,
-  -- że te tabele są połączone. To jest całkiem niezależny temat - ja zobaczę takie łączenie, jak zaciągnę
-  -- taką połączoną tabelę, z bazy danych na swój komputer. Natomiast na schemacie (diagramie) ja widzę jakie są
+  -- I żeby było jasne, nawet jak już zrobię to joinowanie (np.Left), to na schemacie
+  -- (diagramie) nie zobaczę,że te tabele są połączone.
+  -- To jest całkiem niezależny temat - ja zobaczę takie łączenie, jak zaciągnę
+  -- taką połączoną tabelę, z bazy danych na swój komputer. Natomiast na schemacie (diagramie)
+  -- ja widzę jakie są
   -- tabele, jakie mają kolumny,jakie są w nich PK, a jakie FK,
   -- i które tabele za pomocą kluczy PK i FK są ze sobą powiązane - i na tą bazę danych
   -- moje Joinowanie nie ma żadnego wpływu - to jest tylko na moje wewnętrzne potrzeby.
 
-  -- ! A wiadomo, że jak są ze sobą za pomocą PK i FK powiązane te tabele (mają wspólną relację),
-  -- to mogę je zjoinować - bo żeby tabele zjoinować, jasna sprawa jest, że musi być jakaś część wspólna!
+  -- ! A wiadomo, że jak są ze sobą za pomocą PK i FK powiązane te tabele
+  -- (mają wspólną relację),
+  -- to mogę je zjoinować - bo żeby tabele zjoinować, jasna sprawa jest,
+  -- że musi być jakaś część wspólna!
 
 
 --- RIGHT Outer Join = everything on the right table  + anything on the left that matches based on common KEY
@@ -91,9 +120,12 @@
 
 
 --- FULL Outer Join = everything on the left table  + everything on the right table
--- Tu dostajemy wszystko co jest po prawej stronie (Tabela 1), i po stronie lewej (Tabela 2). Czyli łączymy wszystko
--- jak leci. Jeśli jakieś kolumny nawet będą te same, to i tak się dodają do tej tabeli, po prostu będziemy mieli
--- powtórki kolumn.  Np. łączymy table 1(ma 5 kolumn) z tabelą 2(7 kolumn), to jakby nie było, dostaniemy 12 kolumn.
+-- Tu dostajemy wszystko co jest po prawej stronie (Tabela 1), i po stronie lewej (Tabela 2).
+-- Czyli łączymy wszystko
+-- jak leci. Jeśli jakieś kolumny nawet będą te same, to i tak się dodają do tej tabeli,
+-- po prostu będziemy mieli
+-- powtórki kolumn.  Np. łączymy table 1(ma 5 kolumn) z tabelą 2(7 kolumn),
+-- to jakby nie było, dostaniemy 12 kolumn.
 -- Przykład kodu:
 -- Select *
 -- FROM Table_1 (z tabeli 1 - - wiadomo, że zarówno przy tabeli 1 i 2 trzeba  podać: schemat.tabela 1 / 2)
@@ -116,25 +148,33 @@ USE AdventureWorks2014
 
 -- przykład wykorzystania Inner Join
 -- Produkt -> SubKategoria -> Kategoria
-SELECT Production.Product.name         As ProductName, -- tu jak widać korzystamy(Selectujemy) z Production DB
+SELECT Production.Product.name         As ProductName, -- tu jak widać korzystamy
+       -- (Selectujemy) z 'Production' DB
 -- z 3 różnych tabel różne kolumny:
--- product (z tej tabeli wyciągamy nazwę PRODUKTU),productsubcategory (z tej tabeli wyciągamy nazwę podkategorii)
--- oraz ProductCategory(z tej tabeli wyciągamy nazwę kategorii) --> + z których to te dane ściągamy z kolumn 'Name'.
--- Z tym, że te dane kryjące się w kolumnie Name, są w każdej tabeli różne - tak jak opisałem powyżej.
--- Dodatkowo widać, że kolumnę 'name' z tabeli product, zaliasowaliśmy na 'ProductName', zaś kolumnę 'name' w tabeli
--- productsubcategory zostawiliśmy taką samą jak oryginalnie oraz w tabeli ProductCategory kolumnę 'name'
+-- 'Product' = tabela (z tej tabeli wyciągamy nazwę PRODUKTU),productsubcategory
+-- (z tej tabeli wyciągamy nazwę podkategorii)
+-- oraz ProductCategory(z tej tabeli wyciągamy nazwę kategorii) --> + z których to te dane
+-- ściągamy z kolumn 'Name'.
+-- Z tym, że te dane kryjące się w kolumnie Name, są w każdej tabeli różne - tak jak opisałem
+-- powyżej.
+-- Dodatkowo widać, że kolumnę 'name' z tabeli product, zaliasowaliśmy na 'ProductName', zaś
+-- kolumnę 'name' w tabeli
+-- productsubcategory zostawiliśmy taką samą jak oryginalnie oraz w tabeli ProductCategory
+-- kolumnę 'name'
 -- zaliasowaliśmy na 'CategoryName'. Gdybyśmy ich nie zaliasowali, dostalibyśmy z defaultu: nazwatabeli.name, czyli:
 -- 1 kolumna:Product.name, 2 kolumna:Productsubcategory.name, 3 kolumna:ProductCategory.name --> jak widać nazwy
 -- tych kolumn byłyby bardzo długie, więc dlatego je aliasujemy, żeby tabelę uprościć, a kolumny nazwać tak jak my
 -- chcemy.
        Production.Productsubcategory.name,
        Production.ProductCategory.name AS CategoryName
-FROM production.Product -- tabela Product jest tabelą wyjściową i do niej będziemy łączyć kolejne tabele
-    -- jak wiemy można zrobić więcej niż jednego joina, w jednym całościowym Query, żeby połączyć więcej niż
-    -- jedną tabelę ze sobą
-         INNER JOIN Production.Productsubcategory -- tu joinujemy tabelę Productsubcategory z tabelą Product. Ale
-             -- żeby joinowanie zrobić, musimy to zrobić po tym samym kluczu. Więc teraz rozwijamy sobie
-             -- schemat folderowy tabeli 'Product' i 'Productsbcategory' albo diagram (np. w QlikSense),gdzie widać
+FROM production.Product -- tabela Product jest tabelą wyjściową i do niej będziemy łączyć
+-- kolejne tabele
+-- jak wiemy można zrobić więcej niż jednego joina, w jednym całościowym Query,
+-- żeby połączyć więcej niż jedną tabelę ze sobą
+         INNER JOIN Production.Productsubcategory -- tu joinujemy tabelę Productsubcategory
+         -- z tabelą Product. Ale żeby joinowanie zrobić, musimy to zrobić po tym samym kluczu.
+         -- Więc teraz rozwijamy sobie schemat folderowy tabeli 'Product' i 'Productsbcategory'
+         -- albo diagram (np. w QlikSense),gdzie widać
              -- jakie klucze są dostępne i po jakich można zrobić łączenie tabel
              -- za pomocą operatora ON robimy łączenie tabel
                     ON Production.Productsubcategory.Productcategoryid = Production.Product.Productsubcategoryid
@@ -323,7 +363,8 @@ ORDER BY p.ProductID; -- + kolumna ProductID z tabeli Product jest posortowana r
 
 
 
--- Dlaczego daje nam to 0 wierszy? -- generalnie należy unikać mieszania w jednym zapytaniu różnego typu łączeń,
+-- Dlaczego daje nam to 0 wierszy? -- generalnie należy unikać mieszania w jednym zapytaniu
+-- różnego typu łączeń,
 -- np. jak tutaj lewy z prawym
 SELECT DISTINCT c.CustomerID, oh.salesorderid
 from Sales.Customer AS c
@@ -367,7 +408,8 @@ FROM Sales.SalesOrderDetail
 WHERE OrderQty >= 20
 order by productid desc;
 
--- Tutaj zastosujemy distinct - po co nam powtórki, dzięki Disitinct funkcji, pokaże nam tylko IDs produktów, które
+-- Tutaj zastosujemy distinct - po co nam powtórki, dzięki Disitinct funkcji, pokaże nam tylko
+-- IDs produktów, które
 -- miały >= ilosc zamówien i nie będzie ich powtarzał, bo jak wiemy z powyższego przrykładu, pokarze nam wszystkie
 -- zamówienia nawet tego samego ID tyle razy ile razy ta ilość była większa od 20, a wiadomo, że jeśli chodzi o
 -- różny okres czasu, to jeden ID produktu mogł mieć taką ilość zamówień 'n' razy.

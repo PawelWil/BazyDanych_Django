@@ -7,11 +7,13 @@ SELECT * FROM Production.Product
 -- 2. Wyświetl kolumny ProductID, Name i ListPrice dla wszystkich produktów [Production.Product]
 SELECT ProductID, Name, ListPrice FROM Production.Product
 
--- 3. Wyświetl kolumny ProductID, Name i ListPrice dla wszystkich produktów w porządku malejącym według ListPrice [Production.Product]
+-- 3. Wyświetl kolumny ProductID, Name i ListPrice dla wszystkich produktów w porządku
+-- malejącym według ListPrice [Production.Product]
 SELECT ProductID, Name, ListPrice FROM Production.Product
 ORDER BY ListPrice DESC
 
--- 4. Wyświetl kolumny Name, StandardCost i ListPrice dla wszystkich produktów, których ListPrice jest większa lub równa 500 [Production.Product]
+-- 4. Wyświetl kolumny Name, StandardCost i ListPrice dla wszystkich produktów,
+-- których ListPrice jest większa lub równa 500 [Production.Product]
 SELECT Name, StandardCost, ListPrice FROM Production.Product
 WHERE ListPrice >= 500
 
@@ -20,7 +22,8 @@ SELECT Name, Color FROM Production.Product
 Where Color = 'Red'
 ORDER BY Name
 
--- 6. Wyświetl kolumny FirstName, LastName i MiddleName dla wszystkich osób, uporządkowane według LastName, a następnie FirstName [Person.Person]
+-- 6. Wyświetl kolumny FirstName, LastName i MiddleName dla wszystkich osób,
+-- uporządkowane według LastName, a następnie FirstName [Person.Person]
 SELECT FirstName, LastName, MiddleName FROM Person.Person
 ORDER BY LastName, FirstName
 
@@ -33,7 +36,8 @@ where JobTitle Like '%Sales Representative%'
 order by  BusinessEntityID, HireDate
 
 
--- 8. Wyświetl kolumny Name i ListPrice dla wszystkich produktów, które mają ListPrice między
+-- 8. Wyświetl kolumny Name i ListPrice dla wszystkich produktów,
+-- które mają ListPrice między
 -- 500 a 1000, uporządkowane według ListPrice [Production.Product]
 SELECT Name, ListPrice from production.Product
 where ListPrice between 500 and 1000

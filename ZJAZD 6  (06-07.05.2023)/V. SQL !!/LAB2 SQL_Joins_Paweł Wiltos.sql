@@ -20,12 +20,18 @@ FROM Production.Product as p
 
 -- 2. Wybierz imię, nazwisko i adres e-mail dla wszystkich pracowników w
 -- [HumanResources.Employee] i podaj nazwy działu z tabeli [HumanResources.Department]
-select p.FirstName, p.LastName, d.Name
+select p.FirstName, p.LastName, d.Name, ea.EmailAddress
 FROM HumanResources.Employee e
          JOIN Person.Person p on e.BusinessEntityID = p.BusinessEntityID
          JOIN Person.EmailAddress ea on ea.BusinessEntityID = p.BusinessEntityID
          JOIN HumanResources.EmployeeDepartmentHistory dh on dh.BusinessEntityID = e.BusinessEntityID
          JOIN HumanResources.Department d on d.DepartmentID = dh.DepartmentID
+
+SELECT * from Person.Person
+SELECT * FROM Person.EmailAddress
+SELECT * from HumanResources.Department
+SELECT * FROM HumanResources.EmployeeDepartmentHistory
+SELECT * FROM HumanResources.Employee
 
 
 -- 3. Wybierz datę zamówienia, nazwa klienta (Imię + Nazwisko) i sumę należności dla wszystkich
