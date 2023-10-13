@@ -1,39 +1,81 @@
 -- wyświetl "aktywną" bazę danych
-select DB_NAME();
- 
+select DB_NAME(); --pokazuje jak jest wczytana baza danych, ale wiadomo, że wcześniej tą
+-- bazę danych musimy wczytać, czyli jak wczytam, np. bazę danych 'AdventureWorks'
+-- to po wybraniu tej funkcji, wyświetli mi się w tabeli nazwa tej bazy danych
+
 -- przełącz się na bazę danych
 use AdventureWorks;
  
 -- Przykład tworzenia i usuwania bazy danych (jeżeli mamy uprawnienia)
 ----------------------------------------------------------------------
-CREATE DATABASE NewDatabase
+CREATE DATABASE NewDatabase -- wyskakuje 'permission denied' , czyli brak uprawnienia
+-- do tworzenia bazy danych, ale w ten sposób jak coś można utworzyć bazę danych
  
 ALTER DATABASE NewDatabase SET  READ_ONLY WITH NO_WAIT
 GO
  
 USE master
-DROP DATABASE NewDatabase
+DROP DATABASE NewDatabase -- 'DROP' to jest usuwanie
  
  
 CREATE DATABASE NewDatabase
 
 -- Tworzenie i modyfikowanie tabeli
 ---------------------------------------
-USE wiltos
-select DB_NAME();
+USE wiltos --to jest baza danych, która została nazwana moim studenckim loginem
+select DB_NAME(); -- tu sobie sprawdzam, czy ta baza danych 'wiltos' jest odpalona - szczególy
+-- powyżej
 
--- Tabela domyślnie nam się utworzy w schemacie domyslnym - dbo
-CREATE TABLE Customers (
-  ID int PRIMARY KEY,
-  Firstname nvarchar(50) NOT NULL,
-  Lastname nvarchar(50) NOT NULL,
-  BirthDate date NOT NULL
+-- RODZAJE ZMIEnnYCH:
+--     boolean - wartość logiczna - przyjmuje tylko dwie wartości prawda i fłasz (True/False)
+--     integer – liczby całkowite - liczby całkowite, nie posiadające części ułamkowej.
+--     float – liczby rzeczywiste - dowolne wartości.
+--     string – łańcuchy tesktowe - napisy dowolnej długości.
+--     date - typ danych daty
+--     nvarchar - to jest ciąg znaków - zmienna tekstowa
+--     varchar - to też jest ciąg znaków - zmienna tekstowa
+--          Czym się różni Varchar od NVarchar?
+--          NVarchar to jest Unicode, w którym dwa bajty przypadają na jeden znak,
+--          a w Varchar jeden bajt przypada na jeden znak,
+--          z tego wynika, że nvarchar(100) może mieć długośc do 50 znaków,
+--          a varchar(100) moze mieć długość do 100 znaków,
+--          ale jeden i drugi zajmuje tyle samo miejsca na dysku (powierzchnia dysku).
+--          Z tym, że jeśli chodzi o długość znaku, NVarchar zajmują 2 raz więcej
+--          miejsca w porównaniu do typów nieunicodowych tj. 2 bajty na każdy znak.
+--              Co to jest 'UNICODE':
+--              Typ nvarchar, bo o nim tutaj mowa, jest zapisany w standardzie unicode.
+--              Standard ten gwarantuje nam skuteczną pracę z serwerem obsługującym aplikacje
+--              wielojęzyczne. Jeśli chcielibyśmy aby nasza aplikacja działała zarówno
+--              w języku włoskim, polskim jak i w angielskim, pola zawierające tekst muszą
+--              być zadeklarowane jako nchar, w przeciwnym wypadku dojdzie do przekłamań.
+--              Ale Kosztem wprowadzenia typu nchar, jest zwiększenie fizycznej objętości.
+
+
+
+
+-- TWORZEnIE TABELI ! :)
+-- Tabela domyślnie nam się utworzy w schemacie domyslnym - 'dbo'
+CREATE TABLE Customers ( --tworzenie tabeli poprzez polecenie 'CREATE'+Nazwę Tabeli=Customers
+  ID int PRIMARY KEY, -- najpierw definiujemy nazwę kolumny, czyli tu będzie 'ID'
+  -- następnie definujemy jaki typ danych będzie w tej kolumnie, czyli u nas 'int'
+  -- następnie musimy zdefiniować klucz główny tabeli i u nas ta kolumna 'ID'
+  -- będzie dla nas kluczem głównym, czyli 'Primary Key'
+  -- Primary Key innej tabeli, dla tej bedzie jako Foreign Key, czyli obcy klucz, który jest
+  -- ulokowany gdzieś indziej i wlaśnie gdzieś indziej jest Primary Key
+  Firstname nvarchar(50) NOT NULL, --teraz tworzę kolumnę o nazwie 'FirstName', o zmiennej
+  -- typu nVarchar(czyli unicode), gdzie w nawiasie podaje ile maksymalnie znaków można
+  -- zawrzeć, u nas to 50, jeśli będzie więcej wystąpi błąd.
+  -- dając 'NOT NULL', oczekujemy, że w kolumnie 'Firstname' nigdy nie będzie sytuacji, że
+  -- nie będzie żadnej wartości, czyli wartości w tej kolumnie zawsze będą coś pokazywać
+  Lastname nvarchar(50) NOT NULL, -- tu to samo co u gory
+  BirthDate date NOT NULL -- tu kolumna 'BirthDate', zmienna danych 'date' czyli typ
+  -- danych datowy + 'NOT NULL'=musi coś tam byc, inaczej będzie błąd, przy zapisie tabeli
 )
 
 SELECT * FROM Customers
  
 -- usunięcie tabeli
-DROP TABLE Customers
+DROP TABLE Customers -- polecenie DROP + co chcemy usunąć=Table + jaką tabelę='Customers'
  
  
 CREATE TABLE Customers (
@@ -45,9 +87,9 @@ CREATE TABLE Customers (
  
 SELECT * FROM Customers
  
--- altering table - usunięcie kolumny
-ALTER TABLE Customers
-DROP COLUMN WrongColumnName
+-- altering table = updatowanie tabeli + Drop = usunięcie kolumny
+ALTER TABLE Customers -- ALTER = Update tabeli 'Customers'
+DROP COLUMN WrongColumnName--update poprzez usunięcie = dropnięcie columny 'WrongColumnName'
  
  
 SELECT * FROM Customers

@@ -19,7 +19,8 @@ USE AdventureWorks2014
 SELECT YEAR(SellStartDate) AS SellStart, SellStartDate, ProductID, Name
 FROM Production.Product
 ORDER BY SellStart;
---1. jak widać żeby tylko rok wyciągnąć, wpisujemy funkcję 'YEAR' + w nawiasie podajemy z jakiej kolumny
+--1. jak widać żeby tylko rok wyciągnąć, wpisujemy funkcję 'YEAR' + w nawiasie podajemy
+-- z jakiej kolumny
 -- ten rok ma być wyciągnięty + dalismy aliasowanie za pomocą 'AS', gdzie ta kolumna została nazwana jako
 -- 'SellStart'
 --2. Potem zrobiliśmy na samym koncu sortowanie 'Order by' po nowej kolumnie 'SellStart', która wyciąga tylko rok
@@ -42,27 +43,29 @@ FROM Production.Product
 ORDER BY SellStartYear;
 
 -- Funkcje w funkcjach
-SELECT UPPER(Name) AS ProductName, -- Funkcja 'UPPER' przekształca wszystkie litery w kolumnie 'Name' na duże +
-                                   -- + zaliasowała ją na nową nazwę, czyli 'ProductName'
+SELECT UPPER(Name) AS ProductName, -- Funkcja 'UPPER' przekształca wszystkie litery w kolumnie
+       -- 'Name' na duże  + zaliasowała ją na nową nazwę, czyli 'ProductName'
        ProductNumber, -- tu niezależnie/normalnie wyświetlamy kolumnę 'ProductNumber'
        Weight, -- tu niezależnie/normalnie wyświetlamy kolumnę 'Weight'
-       ROUND(Weight, 0) AS ApproxWeight, -- a tu wartości w kolumnie 'Weight' zaokrąglamy za pomocą funkcji 'ROUND',
-                                         -- do pełnej liczby, bo mamy '0', jakby było '1' byłoby zaokrąglenie do 1
-                                         -- liczby po przecinku. Czyli w naszym przypadku po zaokrągrleniu '0',
-                                         -- dostajemy liczbę bez przecinka, np.2.00 + aliasujemy ją jako
-                                         -- 'ApproxWeight'
-                                         -- ! WAŻNE: w SQL po liczbie zawsze dajemy '.'
-       LEFT(ProductNumber, 2) AS ProductType, -- tu stosując funkcję 'LEFT', pobieramy znaki z lewej strony,
-                                        -- w naszym przypadku pobieramy dwa pierwsze znaki + kolumnę aliasujemy
-                                        -- jako ProductType
-       SUBSTRING(ProductNumber,CHARINDEX('-', ProductNumber) + 1, 4) AS ModelCode -- tu robimy za pomocą funkcji
-       -- 'SUBSTRING' z kolumny 'ProductNumber' wyciągninęcie jakichś znaków i umieszczenie ich w innej kolumnie -
-       -- w kolumnie 'ModelCode'. ProductNumber wygląda następująco: FR-T98Y-54, czyli za pomocą funkji w funkcji -
-       -- u nas tą funkcją zagnieżdżoną jest funkcja 'CharIndex', która identyfikuje pierwszy dash= '-',
-       -- który jest znakiem numer 3, więc żeby zacząć wyciąganie od znaku 4, nie zawrzeć dasha,
-       -- musimy dodać 1, i po przecinku podajemy
-       -- ile znaków wyciągamy, czyli podaliśmy 4, więc wyciągamy 4 znaki + wrzucamy te 4 znaki w nową zaaliaso-
-       -- waną kolumnę ''ModelCode'
+       ROUND(Weight, 0) AS ApproxWeight, -- a tu wartości w kolumnie 'Weight' zaokrąglamy
+       -- za pomocą funkcji 'ROUND',
+        -- do pełnej liczby, bo mamy '0', jakby było '1' byłoby zaokrąglenie do 1
+        -- liczby po przecinku. Czyli w naszym przypadku po zaokrągrleniu '0',
+        -- dostajemy liczbę bez przecinka, np.2.00 + aliasujemy ją jako'ApproxWeight'
+        -- ! WAŻNE: w SQL po liczbie zawsze dajemy '.'
+       LEFT(ProductNumber, 2) AS ProductType, -- tu stosując funkcję 'LEFT', pobieramy znaki
+       -- z lewej strony,
+        -- w naszym przypadku pobieramy dwa pierwsze znaki + kolumnę aliasujemy
+        -- jako ProductType
+       SUBSTRING(ProductNumber,CHARINDEX('-', ProductNumber) + 1, 4) AS ModelCode
+       -- tu robimy za pomocą funkcji 'SUBSTRING' z kolumny 'ProductNumber' wyciągnięcie
+       -- jakichś znaków i umieszczenie ich w innej kolumnie -- w kolumnie 'ModelCode'.
+       -- ProductNumber wygląda następująco: FR-T98Y-54, czyli za pomocą funkji w funkcji -
+       -- u nas tą funkcją zagnieżdżoną jest funkcja 'CharIndex', która identyfikuje pierwszy
+       -- dash= '-', który jest znakiem numer 3, więc żeby zacząć wyciąganie od znaku 4,
+       -- nie zawrzeć dasha, musimy dodać 1, i po przecinku podajemy
+       -- ile znaków wyciągamy, czyli podaliśmy 4, więc wyciągamy 4 znaki + wrzucamy te 4
+       -- znaki w nową zaaliasowaną kolumnę ''ModelCode'
 FROM Production.Product; -- dane bierzemy ze schematu Production i z tabeli Product
 
 ---- Funkcje agregujące (przykłady):
@@ -72,17 +75,24 @@ FROM Production.Product; -- dane bierzemy ze schematu Production i z tabeli Prod
 -- minimum, or maximum. - wyciąga minimalną lub maksymalną wartość
 
 
-SELECT COUNT(*) AS Products, -- count + (*), liczy nam ile mamy wszystkich = '*' wierszów w kolumnie Products
-       COUNT(DISTINCT ProductSubcategoryID) AS SubCategories, -- tu nam Count liczy ile jest unikalnych kategorii
-       -- w kolumnie 'ProductSubcategoryID' i wrzuca nam tą daną do zaliasowanej kolumny 'SubCategories'
-       AVG(ListPrice) AS AveragePrice -- i tu za pomocą funkcji AVG, wyciągamy średnią cenę, z cen zawartych
+SELECT COUNT(*) AS Products, -- count + (*), liczy nam ile mamy wszystkich = '*' wierszów
+       -- w kolumnie Products
+       COUNT(DISTINCT ProductSubcategoryID) AS SubCategories, -- tu nam Count liczy ile jest
+       -- unikalnych kategorii
+       -- w kolumnie 'ProductSubcategoryID' i wrzuca nam tą daną do zaliasowanej kolumny
+       -- 'SubCategories'
+       AVG(ListPrice) AS AveragePrice -- i tu za pomocą funkcji AVG, wyciągamy średnią cenę,
+       -- z cen zawartych
         -- w kolumnie ListPrice, które to zostały przerzucone do nowej kolumny AveragePrice
 FROM Production.Product; -- dane ze schematu Production i tabeli Product
 
 
 
-SELECT COUNT(DISTINCT p.ProductID) AS BikeModels, AVG(p.ListPrice) AS AveragePrice --tu nam liczy (Count) ile jest
--- unikalnych (Distinct) produktów, które zawierają w sobie słowo Bikes ('%Bikes' - na końcu po prawej stronie jest
+SELECT COUNT(DISTINCT p.ProductID) AS BikeModels,
+       AVG(p.ListPrice) AS AveragePrice
+--tu nam liczy (Count) ile jest
+-- unikalnych=niepowtarzalnych (Distinct) produktów, które zawierają w sobie słowo Bikes
+-- '%Bikes' - na końcu po prawej stronie jest
 -- Bikes + inne cyfry/znaki/litery po lewej,przed Bikes)zawarte w kolumnie 'ProductID',zaliasowane jako'BikeModels'
 -- + dodatkowo liczy średnią cenę z kolumny ListPrice, która została zaliasowana jako 'AveragePrice'
 FROM Production.Product AS p -- te dane pochodzę ze shematu Production i tabeli Product, ktore to zostało (ten
@@ -97,14 +107,19 @@ WHERE c.Name LIKE '%Bikes'; -- gdzie struktura 'c' w kolumnie 'Name' zawiera po 
 
 ------ Grupowanie danych po wykonaniu funkcji agregujących  -- 'GROUP BY' --
 -- pozwala zgrupować dane po kolumnach
--- występuje wraz z funkcją agregującą, np. 'Count' lub 'Sum' lub 'Average' lub 'Min' lub 'Max'
--- chcąc filtrować dane po zgrupowaniu, należy zamiast 'Where', używać 'Having' + dajemy go zawsze po 'Group by'!
--- zaś Where zawsze dajemy przed 'Group by', z tym że Where nie stosuje się przed funkcjami agregującymi,
--- ale skalarnymi!
+-- występuje wraz z funkcją agregującą, np. 'Count' lub 'Sum' lub 'Average' lub 'Min'
+-- lub 'Max'
+-- chcąc filtrować dane po zgrupowaniu, należy zamiast 'Where', używać 'Having'
+-- + dajemy go zawsze po 'Group by'!
+-- zaś Where zawsze dajemy przed 'Group by', z tym że Where nie stosuje się przed
+-- funkcjami agregującymi, ale skalarnymi!
 -- Kolumny, po których chcemy wykonać grupowanie muszą znajdować się po słowie 'Select'
 
-SELECT StoreID, COUNT(CustomerID) AS Customers --wybieramy kolumne StoreID + zliczamy ilość klientów w kolumnie
--- CustomerID którzy są przypisani do danego sklepu + tą kolumnę CustomersID aliasujemy na Customers
+SELECT StoreID,
+       COUNT(CustomerID) AS Customers --wybieramy kolumne StoreID
+       -- + zliczamy ilość klientów w kolumnie
+-- CustomerID którzy są przypisani do danego sklepu + tą kolumnę CustomersID aliasujemy
+-- na Customers
 FROM Sales.Customer
 GROUP BY StoreID -- czyli grupujemy po StoreID
 ORDER BY Customers desc; -- filtrowanie uzależniamy od danych w kolumnie Customers, które to są sortowane
@@ -112,9 +127,10 @@ ORDER BY Customers desc; -- filtrowanie uzależniamy od danych w kolumnie Custom
 
 
 --a teraz połączenie grupowania z joinem
-SELECT sp.businessentityid, SUM(oh.SubTotal) AS SalesRevenue -- wybierz kolumnę businessentityid ze schematu
--- sales i tabeli salesperson (czyli: sales.salesperson sp) + zsumuj dane z kolumny SubTotal, które to pochodzą
--- ze schematu Sales i tabeli SalesOrderHeader (Sales.SalesOrderHeader oh)
+SELECT sp.businessentityid,
+       SUM(oh.SubTotal) AS SalesRevenue -- wybierz kolumnę businessentityid ze schematu
+-- sales i tabeli salesperson (czyli: sales.salesperson sp) + zsumuj dane z kolumny SubTotal,
+-- które to pochodzą ze schematu Sales i tabeli SalesOrderHeader (Sales.SalesOrderHeader oh)
 FROM Sales.Customer c -- startując ze źródła: schemat Sales i tabela Customer zrób następujące łączenia
          JOIN sales.store s on s.businessentityid = c.storeid --schemat sales i tabelę store nazwij jako s +
     -- następnie już ten skrót s ma kolumnę businessentityid (s.businessentity), który to finalnie będzie
@@ -140,8 +156,10 @@ WHERE COUNT(c.CustomerID) > 100 -- to nie zadziała bo zamiast Where musimy mie�
 -- jak w poniższym przypdaku przed Group By, to dalej nie zadziała
 ORDER BY SalesRevenue DESC; -- zaś Order by dajemy na końcu
 
--- WHERE musi znaleźć się przed słowem kluczowym GROUP BY (ale Dalej nie działa - bo musi być HAVING, gdyż jest
--- to funkja agregująca, a nie skalarna - a jak wiemy, to funkcji agregujących stosujemy Having, które jest zawsze
+-- WHERE musi znaleźć się przed słowem kluczowym GROUP BY (ale Dalej nie działa
+-- - bo musi być HAVING, gdyż jest
+-- to funkja agregująca, a nie skalarna - a jak wiemy, do funkcji agregujących stosujemy
+-- Having, które jest zawsze
 -- umieszczone po 'Group by', zaś Where dajemy przed funkcjami skalarnymi, i który jest umieszczony przed 'Group by')
 SELECT sp.businessentityid, count(c.customerid) AS SalesRevenue
 FROM Sales.Customer c
