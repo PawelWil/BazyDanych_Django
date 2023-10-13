@@ -31,7 +31,8 @@ select DB_NAME(); -- tu sobie sprawdzam, czy ta baza danych 'wiltos' jest odpalo
 --     integer – liczby całkowite - liczby całkowite, nie posiadające części ułamkowej.
 --     float – liczby rzeczywiste - dowolne wartości.
 --     string – łańcuchy tesktowe - napisy dowolnej długości.
---     date - typ danych daty
+--     date - typ danych daty - tylko data
+--     datetime - typ zmiennej, która będzie przetrzymywać datę + czas
 --     nvarchar - to jest ciąg znaków - zmienna tekstowa
 --     varchar - to też jest ciąg znaków - zmienna tekstowa
 --          Czym się różni Varchar od NVarchar?
@@ -87,19 +88,23 @@ CREATE TABLE Customers (
  
 SELECT * FROM Customers
  
--- altering table = updatowanie tabeli + Drop = usunięcie kolumny
+-- altering table = updatowanie tabeli + DROP = usunięcie kolumny
 ALTER TABLE Customers -- ALTER = Update tabeli 'Customers'
 DROP COLUMN WrongColumnName--update poprzez usunięcie = dropnięcie columny 'WrongColumnName'
  
  
 SELECT * FROM Customers
  
--- altering table - dodaie kolumny
-ALTER TABLE Customers ADD BirthDate date
+-- altering table = updatowanie tabeli + ADD = dodanie kolumny
+ALTER TABLE Customers
+ADD BirthDate date -- tu dajemy ADD=dodanie nowej kolumny + nazwa nowej kolumny=BirthDate +
+-- + typ zmiennej tej nowej kolumny
  
 SELECT * FROM Customers
- 
- 
+
+-- Teraz sobie dropniemy tabelę Orders, c o by moc utworzyć jeszcze raz
+DROP table Orders
+
 CREATE TABLE Orders (
   OrderID int PRIMARY KEY,
   OrderDate datetime,
@@ -109,39 +114,51 @@ CREATE TABLE Orders (
 SELECT * FROM Orders
 
 
+
+--WSTAWIANIE DANYCH DO TABEL !
+
 -- wstawianie danych do tabeli Customer
 SELECT * FROM Customers
 
 INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
+-- najpierw polecenie kluczowe 'INSERT' + 'INTO' + do jakiej tabeli=u nas 'Customers' +
+-- + teraz podajemy nazwy kolumn tabeli, do której mają być następnie wstawione dane
 VALUES (1, 'John', 'Smith', '19800105')
+-- a tu poprzez słowo kluczowe 'VALUES' podajemy wartości, jakie mają być wstawione
  
 INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
 VALUES (2, 'Kurt', 'Wallander', '19480105')
  
 -- cannot insert duplicate PRIMARY KEY
 INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
-VALUES (2, 'James', 'Bond', '19680413')
- 
-INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
 VALUES (3, 'James', 'Bond', '19680413')
+
+INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
+VALUES (4, 'James', 'Bond', '19680413')
  
 SELECT * FROM Customers
  
 -- usunięcie wszystkich wierszy z tabeli Customer
-DELETE FROM Customers
+DELETE FROM Customers -- w PyCHarmie, generalnie też się powinno podać polecenie 'WHERE',
+-- ale generalnie nigdzie indziej się tego nie podaje, więc to nie jest bląd, dlatego też
+-- mimo tego, że PyCharm prosi nas o polecenie 'WHERE' możemy je ominąć, klikajac po
+-- prawej stronie informacji wyświetlonej na żółto 'execute'
 
--- czyszcenie tabeli
+-- czyszczenie tabeli można również wykonać za pomocą polecenia 'TRUNCATE'
+   -- Różnica pomiędzy poleceniem 'truncate', a 'delete' jest pokazana ponizej
 TRUNCATE TABLE Customers
-
 /*
-Ważne jest także to, że polecenie TRUNCATE działa o wiele szybciej od DELETE.
+Ważne jest to, że polecenie TRUNCATE działa o wiele szybciej od DELETE.
 Wynika to z mechanizmu działania tych poleceń.
 
-DELETE usuwa wiersze jeden po drugim i tworzy wpis w dzienniku transakcji dla każdego usuniętego wpisu
-TRUNCATE usuwa strony przechowujące dane i tworzy wpis jedynie dla tych stron
-TRUNCATE resetuje opcję AUTOINCREMENT na danej kolumnie do wartości początkowych
-w poleceniu DELETE można użyć klauzuli WHERE by usunąć jedynie pożądane dane
-TRUNCATE usuwa wszystkie dane, brak możliwości filtrowania
+DELETE usuwa wiersze jeden po drugim i tworzy wpis w dzienniku transakcji dla każdego
+usuniętego wpisu.
+TRUNCATE usuwa strony przechowujące dane i tworzy wpis jedynie dla tych stron.
+TRUNCATE resetuje opcję AUTOINCREMENT na danej kolumnie do wartości początkowych.
+W poleceniu DELETE można użyć klauzuli WHERE by usunąć jedynie pożądane dane,
+czyli w polecenie DELETE jest możliwość filtrowania usuwanych wierszy, nie trzeba wszystkich
+usuwać.
+Zaś TRUNCATE usuwa wszystkie dane, brak możliwości filtrowania.
 */
 
  
