@@ -22,18 +22,20 @@ CREATE DATABASE NewDatabase
 
 -- Tworzenie i modyfikowanie tabeli
 ---------------------------------------
-USE wiltos --to jest baza danych, która została nazwana moim studenckim loginem
+USE wiltos --to jest baza danych, która została nazwana moim studenckim loginem,
+-- Poprzez słowo kluczowe 'USE' + nazwa bazy danych, tą bazę wczytujemy
+
 select DB_NAME(); -- tu sobie sprawdzam, czy ta baza danych 'wiltos' jest odpalona - szczególy
 -- powyżej
 
 -- RODZAJE ZMIEnnYCH:
 --     boolean - wartość logiczna - przyjmuje tylko dwie wartości prawda i fłasz (True/False)
 --     integer – liczby całkowite - liczby całkowite, nie posiadające części ułamkowej.
---     float – liczby rzeczywiste - dowolne wartości.
+--     float – liczby rzeczywiste - dowolne wartości, po przecinku itd.
 --     string – łańcuchy tesktowe - napisy dowolnej długości.
 --     date - typ danych daty - tylko data
 --     datetime - typ zmiennej, która będzie przetrzymywać datę + czas
---     nvarchar - to jest ciąg znaków - zmienna tekstowa
+--     nvarchar - to jest ciąg znaków - zmienna tekstowa, zgodna ze standardem UniCode
 --     varchar - to też jest ciąg znaków - zmienna tekstowa
 --          Czym się różni Varchar od NVarchar?
 --          NVarchar to jest Unicode, w którym dwa bajty przypadają na jeden znak,
@@ -67,7 +69,8 @@ CREATE TABLE Customers ( --tworzenie tabeli poprzez polecenie 'CREATE'+Nazwę Ta
   -- typu nVarchar(czyli unicode), gdzie w nawiasie podaje ile maksymalnie znaków można
   -- zawrzeć, u nas to 50, jeśli będzie więcej wystąpi błąd.
   -- dając 'NOT NULL', oczekujemy, że w kolumnie 'Firstname' nigdy nie będzie sytuacji, że
-  -- nie będzie żadnej wartości, czyli wartości w tej kolumnie zawsze będą coś pokazywać
+  -- nie będzie żadnej wartości, czyli wartości w tej kolumnie zawsze będą coś pokazywać,
+  -- Jeśli nic nie zostanie wpisane, wtedy będzie błąd.
   Lastname nvarchar(50) NOT NULL, -- tu to samo co u gory
   BirthDate date NOT NULL -- tu kolumna 'BirthDate', zmienna danych 'date' czyli typ
   -- danych datowy + 'NOT NULL'=musi coś tam byc, inaczej będzie błąd, przy zapisie tabeli
@@ -169,29 +172,36 @@ Zaś TRUNCATE usuwa wszystkie dane, brak możliwości filtrowania.
  nullability of other columns can be definied
 */
 CREATE TABLE Test (
- ID int PRIMARY KEY, -- cannot be null
- Col2_NULL int NULL,
- Col3_NOTNULL int NOT NULL
+ ID int PRIMARY KEY, -- Wartości kluczy głównych nie mogą być nullem. I to jest zasada
+ -- z defaultu. Dlatego tu nie ma sensu dopisywać 'not null'.
+ Col2_NULL int NULL, --tu może mieć wartości 'null', ale nie musi
+ Col3_NOTNULL int NOT NULL -- tu nie może mieć wartości 'null'
 )
+ -- i teraz wprowadzamy wartości do kolumn
+INSERT INTO Test (ID, Col2_NULL, Col3_NOTNULL)
+VALUES (1, 22, 33) -- tu podaliśmy wszystkie wartości
  
 INSERT INTO Test (ID, Col2_NULL, Col3_NOTNULL)
-VALUES (1, 22, 33) -- all 3 columns
- 
-INSERT INTO Test (ID, Col2_NULL, Col3_NOTNULL)
-VALUES (2, NULL, 33) -- explicit defined null value for 2nd col
+VALUES (2, NULL, 33) -- tu podaliśmy w kolumnie 2 'null' więc się 'null' pokaże
  
 INSERT INTO Test (ID, Col3_NOTNULL)
-VALUES (3, 33) -- implicit defined null, by omit value for 2nd col,
+VALUES (3, 33) -- tutaj podaliśmy dwie wartości, ale z racji, że 2 kolumna może zawierać
+-- 'nulle', to program z defaultu 1 wartość weźmie do 1-szej kolumny, a drugą do 3-ej.
+-- Zaś do drugiej wrzuci 'null', bo nic nie zostało podane + może tam być 'null'.
  
 SELECT * FROM Test
  
 -- - 3nd column must not contain null values
 INSERT INTO Test (ID, Col2_NULL, Col3_NOTNULL)
-VALUES (4, 22, NULL) -- explicit defined null value for 3nd col
+VALUES (4, 22, NULL) -- w tym doanui wartości(czyli potocznie mówiąc 'insercie', chcemy
+-- dodać wartość 'null' dla 3ej kolumny, ale to nie przejdzie, gdyż w 3-ej kolumnie
+-- zaznaczyliśmy jasno, że ma byc 'not null', czyli przy wprowadazniu tego do bazy
+-- wystąpi błąd, że nie może wprowadzić tej danej.
  
 -- failed for implicit defined null value
 INSERT INTO Test (ID, Col2_NULL)
-VALUES (5, 22)
+VALUES (5, 22) -- tu też będzie błąd, bo w 'insercie' nie wrzuciłe, kolumnt 3ej, w której
+-- nie może być nulla
  
 SELECT * FROM Test
  
@@ -199,18 +209,27 @@ DROP TABLE Test
  
  
  
--- Przestrzenie (schemas)
+-- Przestrzenie (schematy): Tworzenie, usuwanie
 ---------------------------------------
+-- wiadomo, że schemat jest pod bazą danych, zaś pod schematem znajdują się tabele,
+-- czyli AdvetureWork=Baza Danych, Person = Schemat, Adress=tabela.
  
 -- usunięcie tabeli dbo.Customers
-DROP TABLE dbo.Customers
+DROP TABLE dbo.Customers -- czasami trzeba będzie podać schemat, gdzie jest umieszczona
+-- dana tabela, którą np. chcemy usunąć, bo w różnych schematach jednej bazy danych, są
+-- takie same nazwy tabel, dlatego musimy zawęzić drzewko poszukiwań, żeby nie usunęło
+-- i innych tabel, o tych samych nazwach, ale znajdujących się w innych schematach.
  
 -- sukces ponieważ tabela Orders znajduje się w domyślnym schemacie dbo
 DROP TABLE Orders
-GO
+-- GO
  
-CREATE SCHEMA SqlLearner
-GO
+CREATE SCHEMA SqlLearner -- teraz tworzenie SCHEMATU, poprzez takie samo słowo kluczowe,
+-- jak przy tworzeniu tabel, czyli: 'CREATE' + teraz podaje co chcę utworzyć: 'SCHEMA' +
+-- + teraz podaję nazwę schematu 'SqlLearner'
+-- GO
+
+DROP SCHEMA SqlLearner -- usuwanie schematu, też za pomocą instrukcji DROP
 
 -- Wyświetlenie schematu aktywnego
 SELECT SCHEMA_NAME();
