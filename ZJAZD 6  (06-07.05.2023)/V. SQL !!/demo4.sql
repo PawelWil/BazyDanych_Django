@@ -1,3 +1,11 @@
+-- * Split różnych okien=pokazywanie więcej niż jedno query/tabela w jednym
+-- oknie - jak to robić:
+-- mam powiedzmy jedno okno 1 otwarte, jak chcę otworzyć okno 2 lub tabelę, to klikam 2x
+-- na tym oknie lub tabeli -> następnie prawym myszki na oknie2/Tabeli ->
+-- -> wybieram split: może być na prawo albo poniżej
+
+
+
 -- wyświetl "aktywną" bazę danych
 select DB_NAME(); --pokazuje jak jest wczytana baza danych, ale wiadomo, że wcześniej tą
 -- bazę danych musimy wczytać, czyli jak wczytam, np. bazę danych 'AdventureWorks'
@@ -232,7 +240,7 @@ CREATE SCHEMA SqlLearner -- teraz tworzenie SCHEMATU, poprzez takie samo słowo 
 DROP SCHEMA SqlLearner -- usuwanie schematu, też za pomocą instrukcji DROP
 
 -- Wyświetlenie schematu aktywnego
-SELECT SCHEMA_NAME();
+SELECT SCHEMA_NAME(); --z tym, że nawet jak są różne schematy, to domyślnym jest zawsze 'dbo'
 
 -- Utworzenie Tabeli w innym schemacie
 CREATE TABLE SqlLearner.Customers (
@@ -251,16 +259,22 @@ CREATE TABLE SqlLearner.Orders (
  
 -- próba usunięcia utworzonych tabel
  
-DROP TABLE SqlLearner.Customers
+DROP TABLE SqlLearner.Customers -- wiadomo dajemy DROP do usunięcia, ale nie usuwamy tabel
+-- w domyślnym schemacie 'dbo', ale w nowym 'SQlLearninig', więc oprócz tabeli, jeszcze
+-- musimy podać nazwę schematu, z którego chcemy ją usunąć
  
 -- niepowodzenie ponieważ tabela Orders jest w przestrzeni SqlLearner
-DROP TABLE Orders
+DROP TABLE Orders -- jak będziemy tak robić DROPA, to wyrzuci błąd, bo my w schemacie 'dbo'
+-- nie posiadamy takiej tabeli
  
 -- sukces
-DROP TABLE SqlLearner.Orders
+DROP TABLE SqlLearner.Orders -- czyli usuwamy tą tabelę po podaniu schematu 'SQlLearner'
  
- 
- 
+----To już koniec przykładów na osobnym schemacie.-------
+
+
+---Teraz z powrotem wracamy do defaultowego schematu, jakim jest 'dbo'------
+
 -- Identities
 ---------------------------------------
 -- DROP TABLE Customers
@@ -268,7 +282,14 @@ DROP TABLE SqlLearner.Orders
 DROP TABLE Customers
 
 CREATE TABLE Customers (
-  ID int IDENTITY PRIMARY KEY,
+  ID int IDENTITY PRIMARY KEY, -- w tym przypdaku dajemy komendę 'IDENTITY', dzięki której
+  -- dodatkowy rekord dla kolumny 'ID' nie będzie podawany ręcznie, ale będzie powiększany
+  -- automatycznie, własnie dzięki temu poleceniu 'Identity'. Czyli dzięki niemy ściągamy
+  -- z siebie ciężar wyliczania 'ID'.
+  -- Ale jedna ważna rzecz: że jak użyjemy 'Identity', to silnik (idle=program obsługujacy
+  -- jakąś bazę danych) który nam wygeneruje ileś tam 'ID', to jak usuniemy np. nr = Kowal,
+  -- a potem znów tego Kowala będziemy chcieli dołożyć (zinsertować), to jak najbardziej
+  -- go dołożymy, ale już z najwyzszym = kolejnym w liście numerem ID
   Firstname nvarchar(50),
   Lastname nvarchar(50),
   BirthDate date
@@ -276,16 +297,24 @@ CREATE TABLE Customers (
  
  
 -- niepowodzenie
--- nie możemy podać jawnie wartości kolumny ID
+--gdyż nie możemy podać jawnie wartości kolumny ID, za nas robi to silnik tej bazy danych,
+--czyli idle, który ją obsługuje i sam generuje coraz to kolejne 'ID'.Nie da się jednocześnie
+--miksować funkcji 'Identity' z ręcznym zwiększaniem ID, trzeba wybrać jedną metodę.
+-- Poniżej już jest dobrze.
 INSERT INTO Customers (ID, Firstname, Lastname, BirthDate)
 VALUES (1, 'John', 'Smith', '19800105')
- 
+
+
 -- sukces
+--Tu już jest dobrze, bo z racji, że mamy funkcje 'Identity', to nie wpisujemy kolumny 'ID'
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('John', 'Smith', '19800105')
  
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('Kurt', 'Wallander', '19480105')
+
+INSERT INTO Customers (Firstname, Lastname, BirthDate)
+VALUES ('James', 'Bond', '19980109')
  
 SELECT * FROM Customers
  
@@ -294,16 +323,28 @@ DELETE FROM Customers WHERE ID = 2
  
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('James', 'Bond', '19680413')
-
+-- Ale jedna ważna rzecz: że jak użyjemy 'Identity', to silnik (idle=program obsługujacy
+  -- jakąś bazę danych) który nam wygeneruje ileś tam 'ID', to jak usuniemy np. nr = Kowal,
+  -- a potem znów tego Kowala będziemy chcieli dołożyć (zinsertować), to jak najbardziej
+  -- go dołożymy, ale już z najwyzszym = kolejnym w liście numerem ID
 -- Czyścimy cały nasz Table
-DELETE FROM  Customers
+
+
+DELETE FROM  Customers -- teraz czyścimy całą naszą tabele, za pomocą polecenia 'DELETE' +
+-- + oczywiście muszę dać 'Execute', bo takie ma obostrzenia PyCharm
+-- ALE Ważna rzecz, że jeśli damy 'Delete' to silnik bazy danych=Idle=PyCharm, nawet
+-- jak nam tą tabelę wyczyści=usunie zawartość wszystkich wierszy, to z racji, że przy
+-- tworzeniu tej tabeli był użyty 'IDENTITY', to przy dodawaniu kolejnych wierszy,
+-- kolumna 'ID' utworzona przy pomocy funkcji 'IDENTITY', wystartuje już od tego ostatniego
+-- numeru ID, który być podczas usuwania = Delete, czyli ostatni numer był 4, to teraz jak
+-- dodamy nowy wiersz, to jego ID będzie równe 5, a  nie 1.
+-- Żeby wystartować od początku, trzeba użyć funkcji 'TRUNCATE'
 
 SELECT * FROM Customers
 
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('James', 'Bond', '19680413')
 
--- DALEJ Nasze identyty się nie powtarza
 SELECT * FROM Customers
 
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
@@ -311,7 +352,8 @@ VALUES ('James', 'Bond', '19680413')
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('James', 'Bond', '19680413')
 
--- Ale po Truncate już lecimy od początku
+-- Ale po Truncate już lecimy od początku, czyli ID, nie kontynujemy od ostatniego przed
+-- usunięciem, ale staryujemy od 1
 TRUNCATE TABLE Customers
 
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
@@ -332,14 +374,15 @@ DROP TABLE Orders
  
 -- przykład nr 1 - bez kluczy obcych
 CREATE TABLE Customers (
-  ID int IDENTITY PRIMARY KEY,
+  ID int IDENTITY PRIMARY KEY, -- Ważne: w tabeli Customers, Primary key to kolumna ID
+  -- to będzie miało znaczenie, przy tworzeniu 'Foreign Key'=kluczy obcych
   Firstname nvarchar(50),
   Lastname nvarchar(50),
   BirthDate date
 )
  
 CREATE TABLE Orders (
-  OrderID int IDENTITY PRIMARY KEY,
+  OrderID int IDENTITY PRIMARY KEY,--Ważne: w tabeli Orders, Primary key to kolumna OrderID
   OrderDate datetime,
   CustomerID int
 )
@@ -357,11 +400,13 @@ SELECT * FROM Customers
  
 -- nowe zamówienie z jawnie określoną datą zamówienia orderDate dla klienta o id 1
 INSERT INTO Orders (OrderDate, CustomerID)
-VALUES ('20111115 12:20:45', 1)
+VALUES ('20111115 12:20:45', 1) -- tu w kolumnie OrderDate podajemy datę i godzinę,
+-- co nam oczywiście je doda. Zaś ciekawa funkcja jest poniżej z aktualną datą i godziną !
  
 -- nowe zamówienie z bieżącą datą zamówienia orderDate dla klienta o id 2
 INSERT INTO Orders (OrderDate, CustomerID)
-VALUES (GETDATE(), 2)
+VALUES (GETDATE(), 2) -- tu używamy polecenia 'GETDATE', która pobiera z systemu
+-- aktualną datę + godzinę
  
 SELECT * FROM Orders
  
@@ -376,11 +421,20 @@ VALUES (GETDATE(), 10)
 DROP TABLE Orders
  
 CREATE TABLE Orders (
-  OrderID int IDENTITY PRIMARY KEY,
+  OrderID int IDENTITY PRIMARY KEY, --Ważne: to jest Primary key w kolumnie OrderID,
+  -- w tej tabeli, czyli w tabeli 'Orders'
   OrderDate datetime,
-  CustomerID int FOREIGN KEY REFERENCES Customers(ID)
+  CustomerID int FOREIGN KEY REFERENCES Customers(ID) -- logika tworzenia klucza obcego to:
+  -- nowa kolumna=CustomerID -> jego właściwości to intiger='int'
+  -- -> jest kluczem obcym='FOREIGN KEY' -> odnosi się='REFERENCES' -> tabeli='Customers'
+  -- -> kolumny='ID'
+  -- czyli tu mamy sytuacje, że dodajemy
+  -- nową kolumnę 'CustomerID', która jest Primary Key, dla tabeli 'Customers' - ale tutaj
+  -- ta jest ta kolumna traktowana jako 'Foreign Key', bo odnosi się do kolumny, która
+  -- jest kluczem głównym w innej tabeli
 )
- 
+
+SELECT * FROM Orders
  
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES ('20111115 12:20:45', 1)
