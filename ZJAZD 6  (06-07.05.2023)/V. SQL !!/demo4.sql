@@ -416,7 +416,7 @@ SELECT * FROM Orders
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 10)
  
- 
+--- PIERWSZY SPOSÓB definiowania KLUCZY OBCYCH ---
 -- przykład nr 2 - z kluczem obcym
 DROP TABLE Orders
  
@@ -440,82 +440,158 @@ INSERT INTO Orders (OrderDate, CustomerID)
 VALUES ('20111115 12:20:45', 1)
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 2)
- 
--- nowe zamówienie z bieżącą datą zamówienia orderDate dla nieistniejącego klienta
--- naruszona integralność referencyjna
--- zapytanie zakończone niepowodzeniem
+
+-- Poniższy 'INSERT'=dodanie nowych wartości nie przechodzi, gdyż
+-- nowe zamówienie z bieżącą datą zamówienia orderDate jest dla nieistniejącego klienta
+-- w tabeli 'Customer', którego oczywiście nie da się dodać, dlatego wyskakuje błąd,
+-- bo jak wiemy, uzależniliśmy dane tabeli 'Orders' od klucza obcego 'CustomerID' dla
+-- tabeli Customers - a że tam nie ma CustomerID=10, tylko do 5, to wyrzuci błąd.
+-- Po prostu została naruszona integralność referencyjna=zapytanie zakończone niepowodzeniem
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 10)
  
 SELECT * FROM Orders
- 
--- drugi sposób definiowania kluczy
+
+
+--- DRUGI SPOSÓB definiowania KLUCZY OBCYCH ---
 -- nazwanie ograniczeń zwiększa czytelność
  
 DROP TABLE Orders
  
-CREATE TABLE Orders (
+CREATE TABLE Orders ( -- Tu tworzymy sobie tabelę Orders , na razie bez Foreign Key,
+-- ale z kolumną, która jest widoczna w tabeli 'Customers'
   OrderID int IDENTITY,
   OrderDate datetime,
   CustomerID int
 )
 
--- DEFINIUJEMY GO JAKO STAŁĄ
-ALTER TABLE Orders
-ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
-REFERENCES Customers (ID)
+use wiltos;
+
+
+--> i teraz DEFINIUJEMY nasz Foreign Key, JAKO STAŁĄ, w osobnym zapytaniu (tym poniższym).
+-- Ale żeby to zrobić musimy zrobić update naszej tabeli 'Orders', co oczywiście robimy
+-- poprzez użycie funkcji 'ALTER'
+ALTER TABLE Orders -- za pomocą 'ALter' update tabeli 'Orders'
+ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID) -- i teraz dodanie stałej,która
+-- będzie kluczem obcym, z logiką jak poniżej:
+-- startujemy z funkcją dodawania='ADD' -> stałej='CONSTRAINT' -> nazywamy ją sobie, u nas to:
+-- 'FK_Orders_Customers_ID', gdzie tą nazwę możemy sobie rozszyfrować: FK=foreign key,
+-- Orders= to będzie w  tabeli Orders + następniesię będzie odnosił się do tabeli 'CustomerID'
+-- + do kolumny 'ID' ---ALE DALEJ TO JEST TYLKO NAZWA NASZEJ SATŁEJ ->
+-- -> stała 'FK_Orders_Customers_ID' jest kluczem obcym = 'FOREIGN KEY'
+-- -> na kolumnie 'CustomerID'
+REFERENCES Customers (ID)--ale musimy jeszcze podać, że my odnosimy się do tabeli 'Customers'
+-- i do kolumny 'ID'
 GO
 
-INSERT INTO Orders (OrderDate, CustomerID)
-VALUES (GETDATE(), 10)
+-- I teraz jak sobie wejdziemy w strukturę 'Database'(ta po prawej stronie), żeby sprawdzić,
+-- czy ten foreign key został dodany  + oczywiście rozwiniemy tabelę 'Orders',
+-- to pojawi nam się foreign key=FK_Orders_Customers_ID. Czyli sukces!
 
-ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers_ID
+SELECT * from Orders
+
+INSERT INTO Orders (OrderDate, CustomerID)
+VALUES (GETDATE(), 10) --teraz sobie robimy insert danych, czy po utworzeniu foreign key=
+-- =FK_Orders_Customers_ID, wszystko działa -- ale wiadomo, że to ID=10 nie istnieje, więc
+-- się dodanie tego  NIE POWIEDZIE.
+
+
+ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers_ID -- ale możemy sobie naszą stałą
+-- foreign key=FK_Orders_Customers_ID też usunąć, używając funkcję DROP, ale musimy
+-- pokazać na jakiej tabeli chcemy ten update robić, czyli dla tabeli Orders=TABLE  Orders
 GO
 
--- Usunęliśmy naszą stałą - znowu można zrobić insert danych niespójnych - Nie jesteśmy ACID
+
 INSERT INTO Orders (OrderDate, CustomerID)
+-- Usunęliśmy naszą stałą - znowu można zrobić insert danych niespójnych pomiędzy dwoma
+-- tabelami, czyli Customers i Orders, bo nie ma między nimi powiązania, czyli możemy
+-- sobie do tabeli 'Orders' dodawać bez konsekwencji kolumnę, która nie ma takich wartości
+-- dla tabeli Customers.
 VALUES (GETDATE(), 10)
  
 SELECT * FROM Orders
  
 /*
-WITH CHECK is default option, SQL Server checks if
-data that already exist in the Order table is valid
-we can also use WITH NO CHECK - SQL Server does not apply
-the check to existing rows and will only check the
-reference in future when rows are inserted or updated.
+CHECK to kolejne ograniczenie (CONSTRAINTS) które można nadać na kolumny w tabeli.
+Ogranicza ono zakres wartości które mogą się pojawić w kolumnie.
+Ograniczenie to możemy nałożyć na jedną kolumnę, wtedy ognicza ono wartości
+we wskazanej kolumnie lub nałożyć je na wiele kolumn. Ograniczenie CHECK
+możemy nadać w momencie tworzenia nowej tabeli (Create 'new table'.. lub na już istniejącej
+tabeli (z użyciem polecenia ALTER).
+  - Ponizej przykład uzycia check, przy tworzeniu nowej tabeli:
+CREATE TABLE Pracownicy
+(
+ID_pracownik int NOT NULL CHECK (ID_pracownik >0)
+,Imie varchar(20)
+,Nazwisko varchar(50)
+,Adres varchar(50)
+,Email varchar(30)
+,Telefon int
+)
+
+  - Ponizej przykład uzycia check, przy edycji już istniejącej tabeli:
+ALTER TABLE Pracownicy
+ADD CHECK (ID_pracownik > 0)
 */
-ALTER TABLE Orders WITH CHECK -- wartość domyślna
+ALTER TABLE Orders WITH CHECK -- wartość domyślna w naszym przypadku przy definiowaniu klucza
+-- głównego, w tabeli 'Orders', który powyżej w linii 461, przy tworzeniu nowej tabeli nie
+-- zostal zrobiony
 ADD CONSTRAINT PK_Orders PRIMARY KEY (OrderID)
 GO
  
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 10)
- 
+
+SELECT * from Orders
+
 ALTER TABLE Orders  WITH NOCHECK -- !
-ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
+ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID) -- teraz znowu dodajemy
+-- klucz obcy do tabeli (po ostatnim usunięciu nie dodawaliśmy go). Oczywiście możemy sobie
+-- podejrzeć, czy się pojawił jak rozwiniemy sobie tabelę 'Orders' i Foreign Keys
 REFERENCES Customers (ID)
 GO
  
 SELECT * FROM Orders
  
--- dziwna skłądnia... niepowodzenie z powodu niespójnych danych
+-- dziwna składnia... niepowodzenie z powodu niespójnych danych, polegająca na tym, że
+-- znów chcemy dodać klucz obcy, który już powyżej dodalismy, z tą samą nazwą - także
+-- wiadomo, że program tego nie przyjmie
 ALTER TABLE Orders WITH CHECK CHECK CONSTRAINT FK_Orders_Customers_ID
  
 -- usunięcie wszystkich wierszy...
 DELETE FROM Orders
  
--- dziwna składnia...
--- sukces
+
 ALTER TABLE Orders WITH CHECK CHECK CONSTRAINT FK_Orders_Customers_ID
+-- dziwna składnia...
+-- sukces, bo wcześniej za pomocą Delete wyczyściliśmy wszystkie kolumny i mimo tego, że
+-- użyliśmy znów tej samej zmiennej nie wystąpił błąd, ale ta zmienna oczywiście
+-- nie zduplikowała się, tylko dalej jest jedna.
  
  
  
  
- 
--- Opcja CASCADE
- 
- 
+--- Opcja DELETE CASCADE ---
+/*
+- Czym jest Cascade Delete?
+Cascade Delete to proces automatycznego usuwania powiązanych wierszy w relacyjnych bazach
+danych. Polega on na usuwaniu wierszy związanych kluczem obcym z tabeli nadrzędnej,
+co prowadzi do automatycznego usunięcia wszystkich powiązanych wierszy z tabeli podrzędnej.
+Dzięki temu operacja usuwania jest bardziej efektywna, ponieważ nie trzeba ręcznie usuwać
+każdego powiązanego wiersza.
+
+- Jak działa Cascade Delete?
+Cascade Delete to mechanizm służący do automatycznego usuwania powiązanych rekordów
+z tabeli nadrzędnej w relacyjnej bazie danych. Oznacza to, że gdy usuniemy rekord
+z tabeli rodzica, wszystkie powiązane z nim rekordy w tabeli potomnej zostaną usunięte
+w sposób automatyczny. Dzięki temu nie musimy ręcznie usuwać rekordów zależnych,
+co znacznie ułatwia pracę z bazą danych i minimalizuje ryzyko popełnienia błędów
+przy usuwaniu rekordów.
+ */
+
+
+
+
 -- wstawienie testowych danych
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 1)
