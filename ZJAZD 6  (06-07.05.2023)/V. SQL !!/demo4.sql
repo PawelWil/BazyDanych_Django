@@ -546,8 +546,9 @@ SELECT * from Orders
 
 ALTER TABLE Orders  WITH NOCHECK -- !
 ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID) -- teraz znowu dodajemy
--- klucz obcy do tabeli (po ostatnim usunięciu nie dodawaliśmy go). Oczywiście możemy sobie
--- podejrzeć, czy się pojawił jak rozwiniemy sobie tabelę 'Orders' i Foreign Keys
+-- klucz obcy do tabeli 'Customer' (po ostatnim usunięciu nie dodawaliśmy go). Oczywiście
+-- możemy sobie podejrzeć, czy się pojawił jak rozwiniemy sobie tabelę 'Orders'
+-- i opcję Foreign Keys i tam go zobaczymy
 REFERENCES Customers (ID)
 GO
  
@@ -571,28 +572,29 @@ ALTER TABLE Orders WITH CHECK CHECK CONSTRAINT FK_Orders_Customers_ID
  
  
  
---- Opcja DELETE CASCADE ---
+--- Opcja DELETE CASCADE i UPDATE CASCADE ---
 /*
-- Czym jest Cascade Delete?
-Cascade Delete to proces automatycznego usuwania powiązanych wierszy w relacyjnych bazach
-danych. Polega on na usuwaniu wierszy związanych kluczem obcym z tabeli nadrzędnej,
-co prowadzi do automatycznego usunięcia wszystkich powiązanych wierszy z tabeli podrzędnej.
-Dzięki temu operacja usuwania jest bardziej efektywna, ponieważ nie trzeba ręcznie usuwać
-każdego powiązanego wiersza.
+- Czym jest Cascade Delete i UPDATE CASCADE?
+Cascade Delete i update to proces automatycznego usuwania/updatowania powiązanych wierszy
+w relacyjnych bazach danych. Polega on na usuwaniu/updatowaniu wierszy związanych kluczem
+obcym z tabeli nadrzędnej, co prowadzi do automatycznego usunięcia/updatu wszystkich
+powiązanych wierszy z tabeli podrzędnej.
+Dzięki temu operacja usuwania/updatu jest bardziej efektywna, ponieważ nie trzeba ręcznie
+usuwać/updatować każdego powiązanego wiersza.
 
-- Jak działa Cascade Delete?
-Cascade Delete to mechanizm służący do automatycznego usuwania powiązanych rekordów
-z tabeli nadrzędnej w relacyjnej bazie danych. Oznacza to, że gdy usuniemy rekord
-z tabeli rodzica, wszystkie powiązane z nim rekordy w tabeli potomnej zostaną usunięte
-w sposób automatyczny. Dzięki temu nie musimy ręcznie usuwać rekordów zależnych,
-co znacznie ułatwia pracę z bazą danych i minimalizuje ryzyko popełnienia błędów
-przy usuwaniu rekordów.
+- Jak działa Cascade Delete i Cascade Update?
+Cascade Delete i Update to mechanizm służący do automatycznego usuwania/updatu powiązanych
+rekordów z tabeli nadrzędnej w relacyjnej bazie danych. Oznacza to, że gdy usuniemy/updatujemy
+rekord z tabeli rodzica, wszystkie powiązane z nim rekordy w tabeli potomnej zostaną
+usunięte/zupdatowane w sposób automatyczny. Dzięki temu nie musimy ręcznie usuwać/updatować
+rekordów zależnych, co znacznie ułatwia pracę z bazą danych i minimalizuje ryzyko popełnienia
+błędów przy usuwaniu/updatowaniu rekordów.
  */
 
 
-
-
--- wstawienie testowych danych
+-- wstawienie testowych danych do tabeli 'Orders', które są powiązane z kluczem obcym
+-- z naszymi Klientami z tabeli 'Clients'
+-- żeby móc użyć polecenie 'Delete Cascade'
 INSERT INTO Orders (OrderDate, CustomerID)
 VALUES (GETDATE(), 1)
 INSERT INTO Orders (OrderDate, CustomerID)
@@ -608,10 +610,13 @@ VALUES (GETDATE(), 3)
  
 SELECT * FROM Orders
 SELECT * FROM Customers
- 
--- niepowodzenie ze względu na więzy integralności
+-- w tabeli 'Customer' Primary Key to ID, zaś w tabeli 'Orders' 'CustomerID' to klucz obcy
+
+-- niepowodzenie ze względu na więzy integralności pomiędzy tabelą Orders i Customers.
+-- Za pomocą samego Delete, nie można usunąć czegoś, co jest również zawarte w innej tabeli.
+-- Do tego trza będzie użyć 'Cascade Delete'!
 -- nie możemy usunąć klienta posiadającego zamówienie
-DELETE FROM Customers WHERE ID = 1
+DELETE FROM Customers WHERE ID = 1 -- NIEPOWODZENIE - wytłumaczenie powyżej.
  
 -- możemy zmienić to zachowanie poprzez opcję CASCADE
 /*
@@ -629,21 +634,31 @@ ON DELETE/ON UPDATE NO ACTION
 -- ON UPDATE CASCADE
 ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers_ID
  
-ALTER TABLE Orders 
-ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
-REFERENCES Customers ([ID])
- ON DELETE CASCADE -- kaskadowo usuń dane
- ON UPDATE CASCADE -- kaskadowo edytuj dane
+ALTER TABLE Orders -- teraz robimy update tabeli Orders, co by skorzystać z 'Cascade'
+ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID) -- za pomocą polecenia
+-- CONSTRAINT znów dodajemy stałą o nazwie 'FK_Orders_Customers_ID', która będzie FK(kluczem
+-- obcym), i który będzie kolumną 'CustomerID', oczywiscie dla tabeli 'Orders', bo jak widać
+-- robimy ALTER dla tabeli 'Orders'
+REFERENCES Customers ([ID]) -- tu poprzez REFERENCE, widzimy, że ten klucz obcy 'CustomerID'
+-- z tabeli Orders odnosi się do klucza głownego 'ID' w tabeli 'Customers'
+-- (oczywiście klucze to nazwy kolumn)
+ ON DELETE CASCADE -- kaskadowo usuwamy dane
+ ON UPDATE CASCADE -- kaskadowo edytujemy dane
 GO
- 
  
  
 SELECT * FROM Orders WHERE CustomerID = 1
 SELECT * FROM Customers
+SELECT * FROM Orders
  
--- Teraz usuwanie się uda -> kaskadowo usuniemy zamówienie z tabeli order
-DELETE FROM Customers WHERE ID = 1
- 
+-- Teraz usuwanie się uda -> kaskadowo usuniemy zamówienie z tabeli 'Order', dla której ten
+-- CustomerID jest FK odnośnie do tabeli 'Customer', z której poprzez powiązanie Kaskadowe
+-- również usuwamy zawartość ID=1, powiązanego z kluczem głownym.
+
+
+DELETE FROM Customers WHERE ID = 1 -- to nie wyrzuci błedu, ale tak de facto ten ID=1 został
+-- usunięty kaskadowo - powyżej
+
 SELECT * FROM Orders
 SELECT * FROM Customers
  
@@ -655,8 +670,11 @@ ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers_ID
 ALTER TABLE Orders 
 ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
 REFERENCES Customers ([ID])
- ON DELETE SET NULL
- ON UPDATE SET NULL
+ ON DELETE SET NULL -- podczas usuwania ustawiaj mi tą wartość na Null, co polega na tym, że
+-- zgodnie z komendą poniżej 'DELETE FROM Customers WHERE ID = 2' usunie nam ID=2 z tabeli
+-- 'Customer', a te wartości 2, które były w tabeli 'Customers' i kolumnie 'CustomerID'
+-- zmienią się w nulle, bo wiadomo, że ID=2, zostało usunięte z powiązanej tabli 'Customers'
+ ON UPDATE SET NULL -- podczas edytowania ustawiaj mi tą wartość na Null
 GO
  
  
@@ -698,20 +716,35 @@ SELECT * FROM Customers
  
 CREATE TABLE Orders (
   OrderID int IDENTITY PRIMARY KEY,
-  OrderDate datetime DEFAULT GETDATE(), -- Wartość domyślna
-  CustomerID int
+  OrderDate datetime DEFAULT GETDATE(), -- Wartość domyślna dla kolumny 'OrderDate' będzie
+  -- 'GETDATE', który nam zwróci aktualną datę/czas teraz.
+  CustomerID int -- CustomerID na razie nie jest kluczem obcym
 )
 
 ALTER TABLE Orders
-ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
+ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID) --teraz 'CustomerID' zmienia
+-- się w klucz obcy, bo dodaliśmy Referencje, że ma się odnosić do tabeli 'Customers' i
+-- kolumny 'ID', która to w tabeli Customers jest kluczem głównym, czyli w ten sposób te
+-- 2 tabele są ze sobą powiązane
 REFERENCES Customers (ID)
 GO
  
--- możemy jawnie podać wartość dla kolumny z zadeklarowaną wartością domyślną
-INSERT INTO Orders (OrderDate, CustomerID) VALUES ('20110812', 1)
+-- w tabeli Orders możemy jawnie podać wartość dla kolumny z zadeklarowaną wartością
+-- domyślną
+INSERT INTO Orders (OrderDate, CustomerID)
+VALUES ('20110812', 1) -- tu jawnie, na sztywno, tzw. HardCodowo podajemy, co ma być wpisane.
+--Ale HardCoding tu nie jest najlepszy, bo jak trzeba będzie zmienić datę, to trzeba będzie
+-- się wrócić do kodu i tą zmianę zrobić ręcznie. Gdzie przeciwieństwem jest rozwiązanie
+-- poniżej, gdzie zgodnie z zadeklarowaną wcześniej wartością ma być 'GETDATE'-linia 719,
+-- i w poniższym kodzie, ta wartość daty będzie pobierana z automatu, i za każdym razem jak
+-- się zmieni w systemie (bo GETDATE pobiera dane z systemu) to po wywołaniu tabeli będzie
+-- wartość aktualna.
+
+
 SELECT * FROM Orders
  
--- jeżeli pominiemy kolumnę z zadeklarowaną wartością domyślną sql server wstawi za nas odpowiednią wartość
+-- natomiast jeżeli pominiemy kolumnę z zadeklarowaną wartością domyślną sql server
+-- wstawi za nas odpowiednią wartość - wytłumaczenie powyżej - linia 736-741.
 INSERT INTO Orders (CustomerID) VALUES (2)
 SELECT * FROM Orders
  
