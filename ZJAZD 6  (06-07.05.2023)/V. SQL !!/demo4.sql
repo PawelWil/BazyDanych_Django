@@ -748,7 +748,8 @@ SELECT * FROM Orders
 INSERT INTO Orders (CustomerID) VALUES (2)
 SELECT * FROM Orders
  
--- ten sam rezultat... słowo kluczowe default
+-- ten sam rezultatco powyżej, ale z użyciem słowo kluczowego 'default' - ale raczej tak
+-- się nie stosuje.
 INSERT INTO Orders (OrderDate, CustomerID) VALUES (DEFAULT, 2)
 SELECT * FROM Orders
  
@@ -776,9 +777,13 @@ ALTER TABLE Orders
 ADD CONSTRAINT FK_Orders_Customers_ID FOREIGN KEY(CustomerID)
 REFERENCES Customers (ID)
 GO
- 
- 
--- dane testowe
+
+SELECT * from Orders
+SELECT * from Customers
+
+-- WAŻNE: dane które wprowadzamy, możemy wprowadzić za pomocą jednej linii, nie trzeba
+-- powtarzać Inserta ileś tam razy, tak jak to jest poniżej, możemy to zrobić tak:
+-- 'INSERT INTO Orders (CustomerID) VALUES (1), (1), (2), (3)'
 INSERT INTO Orders (CustomerID) VALUES (1)
 INSERT INTO Orders (CustomerID) VALUES (1)
 INSERT INTO Orders (CustomerID) VALUES (2)
@@ -796,24 +801,48 @@ SELECT * FROM Orders
 ---------------------------------------
 ---------------------------------------
 -- Klauzula sprawdzająca check
+/*
+CHECK to kolejne ograniczenie (CONSTRAINTS) które można nadać na kolumny w tabeli.
+Ogranicza ono zakres wartości które mogą się pojawić w kolumnie.
+Ograniczenie to możemy nałożyć na jedną kolumnę, wtedy ognicza ono wartości
+we wskazanej kolumnie lub nałożyć je na wiele kolumn. Ograniczenie CHECK
+możemy nadać w momencie tworzenia nowej tabeli (Create 'new table'.. lub na już istniejącej
+tabeli (z użyciem polecenia ALTER).
+  - Ponizej przykład uzycia check, przy tworzeniu nowej tabeli:
+CREATE TABLE Pracownicy
+(
+ID_pracownik int NOT NULL CHECK (ID_pracownik >0)
+,Imie varchar(20)
+,Nazwisko varchar(50)
+,Adres varchar(50)
+,Email varchar(30)
+,Telefon int
+)
+
+  - Ponizej przykład uzycia check, przy edycji już istniejącej tabeli:
+ALTER TABLE Pracownicy
+ADD CHECK (ID_pracownik > 0)
+*/
+
 ---------------------------------------
  
-DROP TABLE Orders
-DROP TABLE Customers
+DROP TABLE Orders -- usuwamy sobie dane z tabeli Orders, co by zrobić nowe porównania
+DROP TABLE Customers -- usuwamy sobie dane z tabeli Customers, co by zrobić nowe porównania
  
-CREATE TABLE Customers (
+CREATE TABLE Customers ( --tworzymy tabele Customes z nowymi kolumnami
   ID int IDENTITY,
   Firstname nvarchar(50),
   Lastname nvarchar(50),
   BirthDate date
 )
  
-ALTER TABLE Customers
+ALTER TABLE Customers --edytujemy(ALterujemy) tabele Customers, żeby wprowadzić PK
 ADD CONSTRAINT PK_Customers PRIMARY KEY (ID)
 GO
  
--- wstawienie wiersza z niepoprawną datą urodzenia (przyszła data)
--- sukces
+-- wstawienie wiersza z niepoprawną datą urodzenia (przyszła data) skończyła się
+-- sukcesem, bo nie mamy żadnego sprawdzenia. Poniżej takie sprawdzenie wprowadzimy, za pomocą
+-- klauzulu 'CHECK'.
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('John', 'Smith', '21000105')
  
@@ -826,18 +855,21 @@ ALTER TABLE Customers -- WITH NOCHECK
 ADD CONSTRAINT CK_BirthDate CHECK (BirthDate < GETDATE())
  
 -- usuwamy niepoprawne dane
-DELETE FROM Customers
+DELETE FROM Customers --tu usuwamy dane poprzednie, gdzie był rok 2100, żeby ten CHECK mógł
+-- zadziałać, bo jak tego 2100 nie usunę, to CHECK nie zadziała, bo wartość powyżej
+-- GETDATE jest dostępna
  
--- (powtórnie) sukces
+-- (powtórnie) sukces -- teraz
 ALTER TABLE Customers
 ADD CONSTRAINT CK_BirthDate CHECK (BirthDate < GETDATE())
  
--- (powtórnie)  wstawienie wiersza z niepoprawną datą urodzenia (przyszła data))
--- niepowodzenie
+-- (powtórnie)  wstawienie wiersza z niepoprawną datą urodzenia (przyszła data)) skonczy się
+-- niepowodzeniem, bo wstawiliśmy ograniczenie 'CHECK', które pozwala wstawić tylko te daty,
+-- które są poniżej obecnej daty, bo przecież nie da się urodzić po obecnej dacie.. ;)
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('John', 'Smith', '21000105')
  
--- sukces
+-- sukces - bo dana poniżej obecnej daty
 INSERT INTO Customers (Firstname, Lastname, BirthDate)
 VALUES ('John', 'Smith', '19800105')
 
@@ -854,7 +886,7 @@ GO
  
 ---------------------------------------
 ---------------------------------------
--- Widoki (views)
+-- Widoki (views) - to są pomocnicze tabele, ale tego na razie nie będę używał
 ---------------------------------------
  
 CREATE VIEW vNamesOfCustomers
